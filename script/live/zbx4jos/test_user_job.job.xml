@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<job  order="yes" stop_on_error="no">
+    <script  language="shell">
+        <![CDATA[
+#!/bin/bash
+
+echo "Start test Job Chain"
+
+sleep 20
+
+echo "End test Job Chain"
+
+#
+        ]]>
+    </script>
+
+    <monitor  name="configuration_monitor" ordering="0">
+        <script  java_class="sos.scheduler.managed.configuration.ConfigurationOrderMonitor" language="java"/>
+    </monitor>
+
+    <run_time />
+</job>

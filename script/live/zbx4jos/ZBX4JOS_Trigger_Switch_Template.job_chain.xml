@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<job_chain  orders_recoverable="yes" visible="yes" title="ZBX4JOS Trigger Switch Template">
+    <job_chain_node  state="Trigger_Switch" job="ZBX4JOS_Trigger_switch" next_state="User_Job" error_state="Error"/>
+
+    <job_chain_node  state="User_Job" job="test_user_job" next_state="Trigger_ret" error_state="Error"/>
+
+    <job_chain_node  state="Trigger_ret" job="ZBX4JOS_Trigger_ret" next_state="Success" error_state="Error"/>
+
+    <job_chain_node  state="Success"/>
+
+    <job_chain_node  state="Error"/>
+</job_chain>

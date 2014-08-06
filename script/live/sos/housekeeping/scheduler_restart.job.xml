@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+
+<job title = "Restart Job Scheduler">
+
+    <description>
+       <include file = "jobs/JobSchedulerRestart.xml"/>
+    </description>
+    
+    <params>
+      <!-- restart is forced after given interval of seconds (default: 600) -->
+      <!--<param name = "timeout" value = "600"/>-->          
+    </params>
+    
+    <script language      = "java"
+            java_class    = "sos.scheduler.job.JobSchedulerRestart"/>
+    
+    <!-- restart scheduler every day of the week at the given hour -->
+    <!--
+    <run_time let_run = "yes"
+              begin   = "00:00"
+              end     = "24:00">
+       <period single_start = "04:00"/>
+    </run_time>
+    -->
+
+</job>

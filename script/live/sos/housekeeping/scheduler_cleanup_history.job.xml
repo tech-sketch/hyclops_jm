@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<job title = "Delete log entries in Job Scheduler history">
+
+    <description>
+       <include file = "jobs/JobSchedulerCleanupHistoryDb.xml"/>
+    </description>
+    
+    <params>
+        <param  name="delete_history_interval" value="7"/>
+        <param  name="delete_daily_plan_interval" value="7"/>
+        <param  name="delete_ftp_history_interval" value="7"/>
+    </params>
+
+    <script  language="java" java_class="com.sos.jitl.housekeeping.cleanupdb.JobSchedulerCleanupSchedulerDbJSAdapterClass" java_class_path=""/>
+    
+    <!-- delete history entries every day of the week at the given hour -->
+    <!--
+    <run_time let_run = "yes"
+              begin   = "00:00"
+              end     = "24:00">
+       <period single_start = "01:00"/>
+    </run_time>
+    -->
+
+</job>
