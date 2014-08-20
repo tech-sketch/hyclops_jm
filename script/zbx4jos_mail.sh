@@ -6,7 +6,7 @@ ZBX_NAME="localhost"
 ZBX_KEY="jos_server_status_localhost"
 
 
-MAILLOG=`egrep "^Subject" | grep success`
+MAILLOG=`egrep "success|Erfolg" |grep "^Subject"`
 
 RET=0
 if [ "$MAILLOG" == "" ]
