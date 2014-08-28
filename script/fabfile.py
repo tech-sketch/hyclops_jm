@@ -1305,7 +1305,7 @@ def show_info(dbg=0):
 					item = job.replace('/','.')
 					item = item[1:]
 
-					cmd ="echo -n -e %s %s %s %s | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, elapse, env.zbx_server)
+					cmd ="echo -n -e '%s %s %s %s' | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, elapse, env.zbx_server)
 					local( cmd )
 
 					if dbg in ["1"]:
@@ -1313,15 +1313,16 @@ def show_info(dbg=0):
 						print '                  end_time_2 = %s' % end_time_2
 						print cmd
 
-					if exit_code <> '':		# タスクIDを送信
-						item = "jos_server_status_%s" % (env.process_class[job])
-				##		exit_msg = '\\"Task ID %s : Exit %s\\"' % (task,exit_code)
-						exit_msg = '%s' % (exit_code)
-						cmd ="echo -n -e %s %s %s %s | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, exit_msg, env.zbx_server)
-						local( cmd )
-
-						if dbg in ["1"]:
-							print cmd
+# 不要な機能のため、コメントアウト
+#					if exit_code <> '':		# タスクIDを送信
+#						item = "jos_server_status_%s" % (env.process_class[job])
+#				##		exit_msg = '\\"Task ID %s : Exit %s\\"' % (task,exit_code)
+#						exit_msg = '%s' % (exit_code)
+#						cmd ="echo -n -e %s %s %s %s | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, exit_msg, env.zbx_server)
+#						local( cmd )
+#
+#						if dbg in ["1"]:
+#							print cmd
 
 					jid_flg = 0
 					for jid in last_id:
