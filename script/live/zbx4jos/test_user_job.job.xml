@@ -16,9 +16,5 @@ echo "End test Job Chain"
         ]]>
     </script>
 
-    <monitor  name="configuration_monitor" ordering="0">
-        <script  java_class="sos.scheduler.managed.configuration.ConfigurationOrderMonitor" language="java"/>
-    </monitor>
-
     <run_time />
 </job>

@@ -1,21 +1,54 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-
 <job  order="yes" stop_on_error="no">
+    <params>
+      <include live_file="target_zabbix_host.xml" node=""/>
+      <param name="trigger_name" value="Lack of available memory on server"/> 
+      <param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/>
+    </params>
     <script  language="shell">
         <![CDATA[
 #!/bin/bash
 
-export Z4J_HOME="/home/OSSLUSER/zbx4jos"
-$Z4J_HOME/trigger_switch.sh localhost 5
+echo "------------------------------------------------------------"
+echo "Modify trigger in [$SCHEDULER_PARAM_ZABBIX_HOST]"
+echo "Disable target trigger is [$SCHEDULER_PARAM_TRIGGER_NAME]"
+echo "Enable Temporary trigger is [$SCHEDULER_PARAM_TRIGGER_COND]"
+echo "------------------------------------------------------------"
 
-#
+export Z4J_HOME="/home/scheduler/zbx4jos"
+cd $Z4J_HOME
+
+# escape[,] in trigger name and trigger cond because of fabric input params must be escaped [,]
+ESCAPED_TRIGGER_NAME=`echo "$SCHEDULER_PARAM_TRIGGER_NAME" | sed -e "s/,/\\\\\\\,/g"`
+ESCAPED_TRIGGER_COND=`echo "$SCHEDULER_PARAM_TRIGGER_COND" | sed -e "s/,/\\\\\\\,/g"`
+
+# setting hostid registered in zabbix
+ZABBIX_HOSTID=`fab gethostid:"$SCHEDULER_PARAM_ZABBIX_HOST" | head -1`
+echo "Success of getting zabbix hostid. $SCHEDULER_PARAM_ZABBIX_HOST's zabbix hostid is $ZABBIX_HOSTID"
+
+# setting triggerid disabled by this job
+SOURCE_TRIGGERID=`fab gettriggerid:hostid=$ZABBIX_HOSTID,msg="$ESCAPED_TRIGGER_NAME" | head -1`
+
+# disable and adding triggers
+fab trigger_switch:"$ZABBIX_HOSTID","$ESCAPED_TRIGGER_NAME","$ESCAPED_TRIGGER_COND" > /dev/null 2>&1
+
+# setting triggerid adding by zbx4jos
+DEST_TRIGGERID=`fab gettriggerid:hostid=$ZABBIX_HOSTID,msg="Switched by HyClops_JobMonitoring($ESCAPED_TRIGGER_NAME)" | head -1`
+
+# setting trigger id to JobScheduler's environment file
+if [ -z "$SCHEDULER_PARAM_SOURCE_TRIGGERID" ]; then
+  echo "SOURCE_TRIGGERID=$SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "DEST_TRIGGERID=$DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+else
+  echo "SOURCE_TRIGGERID=$SCHEDULER_PARAM_SOURCE_TRIGGERID $SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "DEST_TRIGGERID=$SCHEDULER_PARAM_DEST_TRIGGERID $DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+fi
+
+echo "Disabled trigger id is $SOURCE_TRIGGERID"
+echo "Enabled trigger id is $DEST_TRIGGERID"
+echo "Success of trigger switching."
         ]]>
     </script>
-
-    <monitor  name="configuration_monitor" ordering="0">
-        <script  java_class="sos.scheduler.managed.configuration.ConfigurationOrderMonitor" language="java"/>
-    </monitor>
-
     <run_time />
 </job>
