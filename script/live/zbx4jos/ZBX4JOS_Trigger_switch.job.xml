@@ -3,7 +3,7 @@
 <job  order="yes" stop_on_error="no">
     <params>
       <include live_file="target_zabbix_host.xml" node=""/>
-      <param name="trigger_name" value="Lack of available memory on server"/> 
+      <param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/> 
       <param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/>
     </params>
     <script  language="shell">

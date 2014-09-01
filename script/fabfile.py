@@ -718,7 +718,7 @@ def gettriggerid(hostid,msg,dbg=0):
 				reskeys = results.keys()
 				if dbg == '1':
 					print "  description : ",results['description']
-				if msg in results['description']:
+				if msg == results['description']:
 					ret = results['triggerid']
 					if dbg == '1':
 						print "     Matched"
