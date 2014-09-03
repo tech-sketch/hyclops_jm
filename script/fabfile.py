@@ -921,7 +921,7 @@ def jos_set_server(dbg=0):
 
 def set_job_info(dbg=0):
 	"""
-	jos_set_server
+	set_job_info
 	JobSchedulerに登録するJob情報を解析してZabbixに登録するitem情報を取得する
 	@param	None		： 
 
@@ -930,14 +930,14 @@ def set_job_info(dbg=0):
 
 	getdbinfo(dbg)
 
-	path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
+	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 登録情報のディレクトリを取得
 	if dbg in ["1","2"]:
-		print "PATH = ",path
+		print "set_job_info source path = ",source_path
 
 	for job in env.job_list:
 		if '.job.xml' in job:				# JOBファイルだけ処理をする。
 			if env.job_list[job] != "DEL":
-				file = "%s%s" % (path, job)
+				file = "%s%s" % (source_path, job)
 				job = job.replace('.job.xml','')
 				env.jos_job.append(job)
 
@@ -958,8 +958,8 @@ def set_job_info(dbg=0):
 	if dbg in ["1","2"]:
 		for job in env.jos_job:
 			print job
-			print '   process_class = %s' % env.process_class[job]
-			print '   order = %s' % env.jos_order[job]
+			print '   [set_job_info]process_class = %s' % env.process_class[job]
+			print '   [set_job_info]order = %s' % env.jos_order[job]
 
 #============================================================
 
@@ -1022,28 +1022,28 @@ def check_jobfile(dbg=0):
 
 	getdbinfo(dbg)
 
-	path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")	# 登録情報のディレクトリを取得
+	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 登録情報のディレクトリを取得
 	if dbg in ["1","2"]:
-		print "PATH = ",path
+		print "Source path = ",source_path
 
-	for root, dirs, files in os.walk(path):			# 登録するファイルの情報取得
+	for root, dirs, files in os.walk(source_path):			# 登録するファイルの情報取得
 	    for file in files:
 		if fnmatch.fnmatch(file, '*.xml'):
 			file = os.path.join(root, file)
-			n = file.replace(path,'')
+			n = file.replace(source_path,'')
 		##	n = n.replace('/','.')
 			regist_size[n] = os.stat(file).st_size
 			regist_time[n] = os.stat(file).st_mtime
 
-	path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 現状ディレクトリを取得
+	dest_path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")	# 現状ファイルの情報取得
 	if dbg in ["1","2"]:
-		print "PATH = ",path
+		print "dest path = ",dest_path
 
-	for root, dirs, files in os.walk(path):			# 現状ファイルの情報取得
+	for root, dirs, files in os.walk(dest_path):			# 現状ファイルの情報取得
 	    for dirs in files:
 		if fnmatch.fnmatch(file, '*.xml'):
 			file = os.path.join(root, dirs)
-			n = file.replace(path,'')
+			n = file.replace(dest_path,'')
 		##	n = n.replace('/','.')
 			live_size[n] = os.stat(file).st_size
 			live_time[n] = os.stat(file).st_mtime
@@ -1076,21 +1076,12 @@ def check_jobfile(dbg=0):
 	if dbg in ["1","2"]:
 		print json.dumps(env.job_list,indent=4)
 
-
-	path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")	# 登録情報のディレクトリを取得
-	if dbg in ["1","2"]:
-		print "PATH = ",path
-
-	for root, dirs, files in os.walk(path):			# 登録するディレクトリの情報取得
-	    n = root.replace(path,'')
+	for root, dirs, files in os.walk(source_path):			# 登録するディレクトリの情報取得
+	    n = root.replace(source_path,'')
 	    regist_dirs[n] = n
 
-	path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 現状ディレクトリを取得
-	if dbg in ["1","2"]:
-		print "PATH = ",path
-
-	for root, dirs, files in os.walk(path):			# 現状ディレクトリの情報取得
-	    n = root.replace(path,'')
+	for root, dirs, files in os.walk(dest_path):			# 現状ディレクトリの情報取得
+	    n = root.replace(dest_path,'')
 	    live_dirs[n] = n
 
 	for rd in regist_dirs:					# ファイル情報を比較
@@ -1132,13 +1123,13 @@ def set_copy_jobs(dbg=0):
 
 	getdbinfo(dbg)
 
-	path_1 = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
+	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")
 	if dbg in ["1","2"]:
-		print "Original File's PATH     = ",path_1
+		print "Source directory PATH     = ",source_path
 
-	path_2 = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")
+	dest_path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
 	if dbg in ["1","2"]:
-		print "JobScheduler File's PATH = ",path_2
+		print "Destination directory PATH = ",dest_path
 
 	check_jobfile(dbg)
 
@@ -1147,7 +1138,7 @@ def set_copy_jobs(dbg=0):
 
 	for dir in  env.job_dirs:
 		if env.job_dirs[dir] == "ADD":
-			cmd = "mkdir %s%s" % (path_2, dir)
+			cmd = "mkdir %s%s" % (dest_path, dir)
 
 			if dbg in ["1","2"]:
 				print(cmd)
@@ -1158,10 +1149,10 @@ def set_copy_jobs(dbg=0):
 	for file in  env.job_list:
 		cmd = ''
 		if env.job_list[file] == "DEL":
-			cmd = "rm %s/%s" % (path_2, file)
+			cmd = "rm %s/%s" % (dest_path, file)
 
 		if env.job_list[file] in ["ADD","MOD"]:
-			cmd = "cp -rp %s/%s %s/%s" % ( path_1, file[1:], path_2,  file[1:] )
+			cmd = "cp -rp %s/%s %s/%s" % ( source_path, file[1:], dest_path,  file[1:] )
 
 		if cmd != '':
 			if dbg in ["1","2"]:
@@ -1172,7 +1163,7 @@ def set_copy_jobs(dbg=0):
 
 	for dir in  env.job_dirs:
 		if env.job_dirs[dir] == "DEL":
-			cmd = "rm -rf %s%s" % (path_2, dir)
+			cmd = "rm -rf %s%s" % (dest_path, dir)
 
 			if dbg in ["1","2"]:
 				print(cmd)
@@ -1460,6 +1451,7 @@ def trigger_switch(hostid,msg,rule,dbg=0):
 	gettrigger_disable(triggerid,dbg)
 
 	desp = "Switched by HyClops_JobMonitoring(%s)" % msg
+
 	zbx_settrigger(hostid,rule,desp,3,dbg)
 
 	return
@@ -1470,8 +1462,8 @@ def trigger_ret(source_triggerid,dest_triggerid,dbg=0):
 	"""
 	trigger_ret
 	trigger_switchで設定した内容を元に戻す
-	@param	source_triggerid		： 有効にするトリガID
-	@param	dest_triggerid		： 元に戻すトリガID
+	@param  source_triggerid		: 有効にするトリガID
+	@param	dest_triggerid		: 削除するトリガID
 
 	@param	None		： 
 	"""
