@@ -106,7 +106,7 @@ def help():
 	print "	show_info	： JobSchedulerからジョブ情報を取得してzabbix_senderで"
 	print "				Zabbixにジョブの処理時間を送信する"
 	print "	set_job_items	： Zabbixにジョブのitemを設定する"
-	print "	get_jobs    	： Level Discavery用にジョブ情報をJSONで表示する"
+	print "	set_jobs    	： Level Discavery用にジョブ情報をJSONでZabbixに送信する"
 	print "	trigger_switch	： 現状のTriggerを無効にして代わりを設定する"
 	print "		[パラメータ]	： hostid	： 無効にするホストID"
 	print "				　 msg		： 無効にするトリガ名"
@@ -1295,7 +1295,7 @@ def show_info(dbg=0):
 					item = job.replace('/','.')
 					item = item[1:]
 
-					cmd ="echo -n -e '%s %s %s %s' | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, elapse, env.zbx_server)
+					cmd ="echo -n -e '%s job[%s] %s %s' | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, elapse, env.zbx_server)
 					local( cmd )
 
 					if dbg in ["1"]:
@@ -1363,7 +1363,6 @@ def set_job_items(dbg=0):
 
 		print '  %s --> %s(%s)' % (name,env.process_class[job],hostid)
 
-		zbx_setitems(name,hostid,dbg)
 
 	print "===<<< Set Items for Job Chain >>>==="	# Job Chainのitemの処置
 	for job in env.jos_job_chain:
@@ -1374,7 +1373,6 @@ def set_job_items(dbg=0):
 
 		print '  %s --> %s(%s)' % (name,env.process_class[job],hostid)
 
-		zbx_setitems(name,hostid,dbg)
 
 	print "===<<< Set Items for JOS Server >>>==="	# ジョブステータス用のitem登録
 	for serv in env.zbx_server_list:
@@ -1389,13 +1387,14 @@ def set_job_items(dbg=0):
 		desp = "jos_server_status_localhost_event"
 		zbx_settrigger(hostid,exp,desp,3,dbg)
 
+	set_jobs(dbg)
 	set_copy_jobs(dbg)				# 登録情報ファイルに現状ファイルを合わせる
 
 #============================================================
 
-def get_jobs(dbg=0):
+def set_jobs(dbg=0):
 	"""
-	get_jobs
+	set_jobs
 	Low Level Discavery用にジョブ情報をJSONで表示する
 	@param	None		： 
 
@@ -1411,28 +1410,35 @@ def get_jobs(dbg=0):
 	set_job_info(dbg=0)
 	set_job_chain_info(dbg=0)
 
-	msg =''
+	msg ={}
 	for job in env.jos_job:
 		name = job.replace('/','.')
 		name = name.replace('.job.xml','')
 		name = name[1:]
 		hostid = env.zbx_server_list[env.process_class[job]]
+		itemname = "Jobscheduler\'s Job (%s)" % (name)
+		item = {"{#ITEM_NAME}":itemname,"{#JOB_NAME}":name}
+		if env.process_class[job] not in msg:
+			msg[env.process_class[job]] = []
 
-		msg = msg + '{"{#item_%s}":"%s"},' % (env.process_class[job],name)
-
+		msg[env.process_class[job]].append(item)
 
 	for job in env.jos_job_chain:
 		name = job.replace('/','.')
 		name = name.replace('.job_chain.xml','')
 		name = name[1:]
 		hostid = env.zbx_server_list[env.process_class[job]]
+		itemname = "Jobscheduler\'s Job (%s)" % (name)
+		item = {"{#ITEM_NAME}":itemname,"{#JOB_NAME}":name}
+		if env.process_class[job] not in msg:
+			msg[env.process_class[job]] = []
 
-		msg = msg + '{"{#item_%s}":"%s"},' % (env.process_class[job],name)
+		msg[env.process_class[job]].append(item)
 
-	res = '{"data":[%s]}' %  msg[:-1]
-	recvbuf = json.loads(res)
+	for k,v in msg.items():
 
-	print json.dumps(recvbuf, indent=4)
+		cmd ="/usr/bin/zabbix_sender -z %s -s %s -k job.discovery -o \"{\\\"data\\\":%s}\"" % ( env.zbx_server, k, json.dumps(v).replace("\"","\\\""))
+		local(cmd, capture=True, shell=None)
 
 #============================================================
 
