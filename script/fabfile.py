@@ -725,8 +725,7 @@ def gettriggerid(hostid,msg,dbg=0):
 
 				i = i + 1
 
-	if dbg == '1':
-		print ret
+	print ret
 
 	return ret
 
@@ -1460,30 +1459,26 @@ def trigger_switch(hostid,msg,rule,dbg=0):
 	triggerid = gettriggerid(hostid,msg,dbg)
 	gettrigger_disable(triggerid,dbg)
 
-	desp = "%s" % "Switched by ZBX4JOS"
+	desp = "Switched by HyClops_JobMonitoring(%s)" % msg
 	zbx_settrigger(hostid,rule,desp,3,dbg)
 
 	return
 
 #============================================================
 
-def trigger_ret(hostid,msg,dbg=0):
+def trigger_ret(source_triggerid,dest_triggerid,dbg=0):
 	"""
-	trigger_switch
+	trigger_ret
 	trigger_switchで設定した内容を元に戻す
-	@param	hostid		： 有効にするホストID
-	@param	msg		： 元に戻すトリガ名
+	@param	source_triggerid		： 有効にするトリガID
+	@param	dest_triggerid		： 元に戻すトリガID
 
 	@param	None		： 
 	"""
 
-	desp = "%s" % "Switched by ZBX4JOS"
+	gettrigger_enable(source_triggerid,dbg)
 
-	triggerid = gettriggerid(hostid,desp,dbg)
-	zbx_deltrigger(triggerid,dbg)
-
-	triggerid = gettriggerid(hostid,msg,dbg)
-	gettrigger_enable(triggerid,dbg)
+	zbx_deltrigger(dest_triggerid,dbg)
 
 	return
 
