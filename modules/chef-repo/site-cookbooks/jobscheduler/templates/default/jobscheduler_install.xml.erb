@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+XML configuration file for JobScheduler setup
+
+The JobScheduler is available with a dual licensing model.
+- GNU GPL 2.0 License (see http://www.gnu.org/licenses/gpl-2.0.html)
+- JobScheduler Commercial License (see licence.txt)
+
+The setup asks you for the desired license model 
+(see <entry key="licenceOptions" .../> below).
+
+If you call the setup with this XML file then you accept 
+at the same time the terms of the chosen license agreement. 
+-->
+<AutomatedInstallation langpack="eng">
+    <com.izforge.izpack.panels.UserInputPanel id="home">
+        <userInput/>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="licences">
+        <userInput>
+
+            <!-- Select the license model (GPL or Commercial) -->
+            <entry key="licenceOptions" value="GPL"/>
+
+            <!-- If you selected GPL as license model than the licence must be empty.
+                 Otherwise please enter a license key if available.
+                 It is also possible to modify the license key later. -->
+            <entry key="licence" value=""/>
+
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.HTMLLicencePanel id="gpl_licence"/>
+    <com.izforge.izpack.panels.HTMLLicencePanel id="commercial_licence"/>
+    <com.izforge.izpack.panels.TargetPanel id="target">
+        
+        <!-- SELECT THE INSTALLATION PATH FOR THE BINARIES AND LIBRARIES
+             The installation expands this path with the Scheduler ID as subdirectory.
+             The path must be absolute!
+             Default paths are
+             /opt/sos-berlin.com/jobscheduler for Unix
+             C:\Program Files\sos-berlin.com\jobscheduler for Windows -->
+        <installpath><%= node[:jobscheduler][:engine][:scheduler_data] %></installpath>
+        
+    </com.izforge.izpack.panels.TargetPanel>
+    <com.izforge.izpack.panels.UserPathPanel id="userpath">
+        
+        <!-- SELECT THE DATA PATH FOR CONFIGURATION AND LOG FILES
+             The installation expands this path with the Scheduler ID as subdirectory.
+             The path must be absolute!
+             Default paths are
+             /home/[user]/sos-berlin.com/jobscheduler for Unix
+             C:\ProgramData\sos-berlin.com\jobscheduler for newer Windows
+             C:\Documents and Settings\All Users\Application Data\sos-berlin.com\jobscheduler for older Windows -->
+             <UserPathPanelElement><%= node[:jobscheduler][:engine][:scheduler_home] %></UserPathPanelElement>
+        
+    </com.izforge.izpack.panels.UserPathPanel>
+    <com.izforge.izpack.panels.PacksPanel id="package">
+    
+        <!-- SELECT THE PACKS WHICH YOU WANT INSTALL -->
+           
+        <!-- Package: JobScheduler
+             JobScheduler Basic Installation
+             THIS PACK IS REQUIRED. IT MUST BE TRUE -->
+        <pack index="0" name="Job Scheduler" selected="true"/>
+        
+        <!-- Package: Update Service
+             It checks every week, if a new release has been made. -->
+        <pack index="1" name="Update Service" selected="false"/>
+        
+        <!-- Package: Database Support
+             Job history and log files can be stored in a database. Database support is 
+             available for MySQL, PostgreSQL, Firebird, Oracle, SQL Server, DB2.
+             This package is strongly recommended. -->
+        <pack index="2" name="Database Support" selected="true"/>
+        
+        <!-- Package: Housekeeping Jobs
+             Housekeeping Jobs are automatically launched by the Job Scheduler, e.g. to send 
+             buffered logs by mail, to remove temporary files or to restart the JobScheduler. -->
+        <pack index="5" name="Housekeeping Jobs" selected="true"/>
+        
+        <!-- Package: Cron Job
+             THIS PACKAGE IS ONLY FOR UNIX.
+             The Cron Adapter Job can be used to configure the JobScheduler with a crontab file. 
+             For that purpose, the Job reads the crontab file and dynamically adjusts the 
+             JobScheduler configuration. -->
+        <pack index="7" name="Cron" selected="false"/>
+        
+    </com.izforge.izpack.panels.PacksPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="network">
+        <userInput>
+            <!-- Network Configuration -->
+            
+            <!-- Enter the name or ip address of the host on which the JobScheduler is operated -->
+            <entry key="schedulerHost" value="<%= node[:jobscheduler][:engine][:host] %>"/>
+            
+            <!-- Enter the port for TCP communication -->
+            <entry key="schedulerPort" value="<%= node[:jobscheduler][:engine][:port] %>"/>
+            
+            <!-- Enter the port for Jetty HTTP -->
+            <entry key="jettyHTTPPort" value="40444"/>
+            
+            <!-- Enter the port for Jetty HTTPS -->
+            <entry key="jettyHTTPSPort" value="48444"/>
+            
+            <!-- To enter a JobScheduler ID is required. 
+                 The IDs of multiple instances of the JobScheduler must be unique per server. 
+                 The JobScheduler ID expands the above installation paths as subdirectory.
+                 Please omit special characters like: / \ : ; * ? ! $ % & " < > ( ) | ^ -->
+                 <entry key="schedulerId" value="<%= node[:jobscheduler][:engine][:scheduler_id] %>"/>
+            
+            <!-- It is recommended to enable TCP access for the host where the JobScheduler will install, 
+                 optionally enter additional host names or ip addresses. To enable all hosts in your 
+                 network to access the JobScheduler enter '0.0.0.0'. -->
+                 <entry key="schedulerAllowedHost" value="<%= node[:jobscheduler][:engine][:allow_host] %>"/>
+            
+            <!-- Choose (yes or no) wether the JobScheduler should be started at the end of the installation -->
+            <entry key="launchScheduler" value="yes"/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="cluster">
+        <userInput>
+            <!-- Cluster Configuration -->
+            
+            <!-- The JobScheduler can be installed independent of other possibly JobSchedulers, 
+                 as a primary JobScheduler in a backup system or as a backup JobScheduler. 
+                 Use '' for a standalone, '-exclusive' for a primary 
+                 or '-exclusive -backup' for a backup JobScheduler.
+                 A database is required for a backup system. All JobSchedulers in a backup system 
+                 must have the same JobScheduler ID and the same database. 
+                 Further you can set '-distributed-orders' for a load balancing cluster.
+                 For more information see
+                 http://www.sos-berlin.com/doc/en/scheduler/sos_help.htm?help_URL=scheduler.backup.htm
+                 http://www.sos-berlin.com/doc/en/scheduler/sos_help.htm?help_URL=scheduler.distributed_orders.htm -->
+            <entry key="clusterOptions" value=""/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="smtp">
+        <userInput>
+            <!-- Mail Recipients Configuration / SMTP Authentication -->
+            
+            <!-- Enter the ip address or host name and port (default: 25) of your SMTP server -->
+            <entry key="mailServer" value="<%= node[:jobscheduler][:engine][:mail_server] %>"/>
+            <entry key="mailPort" value="<%= node[:jobscheduler][:engine][:mail_port] %>"/>
+            
+            <!-- Configure the SMTP authentication if necessary. -->
+            <entry key="smtpAccount" value="<%= node[:jobscheduler][:engine][:smtp_user] %>"/>
+            <entry key="smtpPass" value="<%= node[:jobscheduler][:engine][:smtp_password] %>"/>
+            
+            <!-- Enter the addresses of recipients to which mails with log files are automatically
+                 forwarded. Separate multiple recipients by commas -->
+            
+            <!-- Account from which mails are sent -->
+            <entry key="mailFrom" value="<%= node[:jobscheduler][:engine][:mail_from] %>"/>
+            
+            <!-- Recipients of mails -->
+            <entry key="mailTo" value="<%= node[:jobscheduler][:engine][:mail_to] %>"/>
+            
+            <!-- Recipients of carbon copies: -->
+            <entry key="mailCc" value="<%= node[:jobscheduler][:engine][:mail_cc] %>"/>
+            
+            <!-- Recipients of blind carbon copies -->
+            <entry key="mailBcc" value="<%= node[:jobscheduler][:engine][:mail_bcc] %>"/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="email">
+        <userInput>
+            <!-- Mail Configuration / Event Handler -->
+            
+            <!-- Choose in which cases mails with log files are automatically forwarded. -->
+            <entry key="mailOnError" value="yes"/>
+            <entry key="mailOnWarning" value="yes"/>
+            <entry key="mailOnSuccess" value="no"/>
+            
+            <!-- The Housekeeping package is required for configure JobScheduler as event handler
+                 Choose this option if you intend to use JobScheduler Events and
+                 - this JobScheduler instance is the only instance which processes Events
+                 - this JobScheduler instance is a supervisor for other JobSchedulers which submit Events -->
+                 <entry key="jobEvents" value="<%= node[:jobscheduler][:engine][:job_event] %>"/> 
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="update">
+        <userInput>
+            <!-- Update Configuration 
+                 These entries are only necessary if the package 'Update Service' is chosen. -->
+            
+            <!-- The JobScheduler checks every week if a new release has been made. In this case 
+                 you will receive an email. Furthermore an automatic download of the update can be 
+                 started which will save the 'scheduler_(win32|linux|solaris)_update.(zip|tar.gz)' 
+                 file in the JobScheduler installation directory. -->
+                 
+            <!-- Enter the start time in the format HH:MM -->
+            <entry key="checkForUpdateStarttime" value="20:00"/>
+            
+            <!-- Select the weekday via '0' for sunday, '1' for monday , ... and '6' for saturday. -->
+            <entry key="checkForUpdateStartday" value="1"/>
+            
+            <!-- Choose '1' for automatic download, otherwise '0'. -->
+            <entry key="autoUpdateDownload" value="0"/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="database">
+        <userInput>
+            <!-- Database Configuration 
+                 These entries are only necessary if the package 'Database Support' is chosen.-->
+                 
+            <!-- Choose the database management system. Supported values are 'mysql' for MySQL,
+                 'oracle' for Oracle, 'mssql' for MS SQL Server, 'pgsql' for PostgreSQL,
+                 'fbsql' for Firebird, 'db2' for DB2 and 'sybase' for Sybase. -->
+                 <entry key="databaseDbms" value="<%= node[:jobscheduler][:engine][:database][:type] %>"/>
+            
+            <!-- You can choose between 'on' or 'off' to create the database tables.
+                 If you have modified the initial data of an already existing installation, 
+                 then the modifications will be undone. Data added remains unchanged. 
+                 This entry should be only 'off', when you sure, that all tables are already created. -->
+            <entry key="databaseCreate" value="on"/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="dbconnection">
+        <userInput>
+            <!-- Database Configuration 
+                 These entries are only necessary if the package 'Database Support' is chosen. -->
+                 
+            <!-- Enter the name or ip address of the database host -->
+            <entry key="databaseHost" value="<%= node[:jobscheduler][:engine][:database][:host] %>"/>
+            
+            <!-- Enter the port number for the database instance. Default ports are for MySQL 3306, 
+                 Oracle 1521, MS SQL Server 1433, postgreSQL 5432, Firebird 3050, DB2 50000, Sybase 5000. -->
+                 <entry key="databasePort" value="<%= node[:jobscheduler][:engine][:database][:port] %>"/>
+            
+            <!-- Enter the schema -->
+            <entry key="databaseSchema" value="<%= node[:jobscheduler][:engine][:database][:schema] %>"/>
+            
+            <!-- Enter the user name for database access -->
+            <entry key="databaseUser" value="<%= node[:jobscheduler][:engine][:database][:user] %>"/>
+            
+            <!-- Enter the password for database access -->
+            <entry key="databasePassword" value="<%= node[:jobscheduler][:engine][:database][:password] %>"/>
+            
+            <!-- You must provide the MySQL, MS SQL Server or Sybase JDBC Driver respectively if you selected 
+                 corresponding DBMS type. For license reasons MySQL, Sybase and MS SQL Server JDBC Drivers are 
+                 not provided. Alternatively you can use the mariadb JDBC Driver for MySQL and 
+                 the jTDS JDBC Driver for MS SQL Server and Sybase which is provided.-->
+                 
+            <!-- You can choose between 'yes' or 'no' for using the jTDS JDBC Driver
+                 This entry has only an effect for MS SQL Server or Sybase -->
+            <entry key="connectorJTDS" value="yes"/>
+            
+            <!-- You can choose between 'yes' or 'no' for using the mariadb JDBC Driver
+                 This entry has only an effect for MySQL -->
+            <entry key="connectorMaria" value="yes"/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="jdbc">
+        <userInput>
+            <!-- Configuration for JDBC Driver 
+                 This entry is only necessary if the package 'Database Support' is chosen and you 
+                 selected a DBMS type like MySQL, MS SQL Server or Sybase in the previous 
+                 <userInput> element. -->
+                 
+            <!-- You must provide the MySQL, MS SQL Server or Sybase JDBC Driver respectively if you selected 
+                 corresponding DBMS type. For license reasons MySQL and MS SQL Server JDBC Drivers are 
+                 not provided. Specify the JDBC Driver source (e.g. mysql-connector-java-*.jar for MySQL, 
+                 sqljdbc.jar for MS SQL Server, jconn3.jar for Sybase). Alternatively you can use the mariadb 
+                 JDBC Driver for MySQL and the jTDS JDBC Driver for MS SQL Server and Sybase which is provided. -->
+                 
+            <!-- Select the path to JDBC Driver -->
+            <entry key="connector" value=""/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="cron">
+        <userInput>
+            <!-- Configuration for Cron Job
+                 This input panel is ONLY FOR UNIX AVAILABLE
+                 These values will be ignored under Windows -->
+            
+            <!-- Enter the crontab path -->
+            <entry key="cronCrontab" value="/etc/crontab"/>
+            
+            <!-- Select system crontab (1) or user crontab (0) -->
+            <entry key="cronSystab" value="1"/>
+            
+            <!-- Enter the default job timeout (in s)
+                 The value must greater than 0 -->
+            <entry key="cronTimeout" value="600"/>
+            
+            <!-- For system crontabs enter the preprocessing type 
+                 su      for su [user] -c [command]
+                 sudo    for sudo -u [user] [command]
+                 (empty) for custom change user command -->
+            <entry key="cronChangeUser" value=""/>
+            
+            <!-- Enter the custom change user command -->
+            <entry key="cronChangeCommand" value=""/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.InstallPanel id="install"/>
+    <com.izforge.izpack.panels.ProcessPanel id="process"/>
+    <com.izforge.izpack.panels.FinishPanel id="finish"/>
+</AutomatedInstallation>
