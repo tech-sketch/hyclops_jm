@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-
-<job_chain orders_recoverable="no" max_orders="1">
-    <job_chain_node state="start" job="scheduler_event_service" next_state="end" error_state="error"/>
-    <job_chain_node state="end"/>
-    <job_chain_node state="error"/>
-</job_chain>
