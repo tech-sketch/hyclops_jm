@@ -975,14 +975,14 @@ def set_job_chain_info(dbg=0):
 	getdbinfo(dbg)
 
 
-	path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
+	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 登録情報のディレクトリを取得
 	if dbg in ["1","2"]:
-		print "PATH = ",path
+		print "[set_job_chain_info]source path = ",source_path
 
 	for job in env.job_list:
 		if '.job_chain.xml' in job:				# JOBファイルだけ処理をする。
 			if env.job_list[job] != "DEL":
-				file = "%s%s" % (path, job)
+				file = "%s%s" % (source_path, job)
 				job = job.replace('.job_chain.xml','')
 				env.jos_job_chain.append(job)
 
