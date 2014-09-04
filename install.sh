@@ -17,6 +17,18 @@ if [ `cat /etc/redhat-release | wc -l` -ne 1 ]; then
   exit 1
 fi
 
+# Install fabric
+yum groupinstall -y "Development Tools" "Base"
+yum install -y zlib-devel tk-devel tcl-devel sqlite-devel ncurses-devel gdbm-devel readline-devel bzip2-devel db4-devel openssl-devel python-setuptools python-devel python-pip  --enablerepo=centosplus
+easy_install pip virtualenv
+pip install setuptools --no-use-wheel --upgrade
+pip install fabric
+
+if [ `echo $?` -ne 0 ]; then
+  echo "Fabric install error occured."
+  exit 1
+fi
+
 # Chef install
 if [ `rpm -q chef | wc -l` -ne 1 ]; then
   curl -L https://www.opscode.com/chef/install.sh | bash
