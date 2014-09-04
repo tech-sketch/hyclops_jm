@@ -1,0 +1,19 @@
+<?php
+// Zabbix GUI configuration file
+global $DB;
+
+$DB["TYPE"]>>->->-= '<%= node[:zabbix][:server][:db_type] %>';
+$DB["SERVER"]>>->-= '<%= node[:zabbix][:server][:db_host_url] %>';
+$DB["PORT"]>>->->-= '0';
+$DB["DATABASE"]>>->-= '<%= node[:zabbix][:server][:db_name] %>';
+$DB["USER"]>>->->-= '<%= node[:zabbix][:server][:db_user] %>';
+$DB["PASSWORD"]>>->-= '<%= node[:zabbix][:server][:db_pass] %>';
+// SCHEMA is relevant only for IBM_DB2 database
+$DB["SCHEMA"]>>->-= ''; 
+
+$ZBX_SERVER>>->->-= '<%= node[:zabbix][:server][:host_url] %>';
+$ZBX_SERVER_PORT>->-= '<%= node[:zabbix][:server][:port] %>';
+$ZBX_SERVER_NAME>->-= 'ZabbixServer for HyClops JM'; 
+
+$IMAGE_FORMAT_DEFAULT>= IMAGE_FORMAT_PNG;
+?>
