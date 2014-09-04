@@ -928,6 +928,9 @@ def set_job_info(dbg=0):
 	@reruen	None		： （env.process_classに情報を設定する）
 	"""
 
+	if env.jos_job:
+		return True
+
 	getdbinfo(dbg)
 
 	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 登録情報のディレクトリを取得
@@ -972,15 +975,17 @@ def set_job_chain_info(dbg=0):
 	@reruen	None		： （env.process_classに情報を設定する）
 	"""
 
-	getdbinfo(dbg)
+	if env.jos_job_chain:
+		return True
 
+	getdbinfo(dbg)
 
 	source_path = "%s/%s" % (os.getenv("SCHEDULER_DATA"), "config/live")	# 登録情報のディレクトリを取得
 	if dbg in ["1","2"]:
 		print "[set_job_chain_info]source path = ",source_path
 
 	for job in env.job_list:
-		if '.job_chain.xml' in job:				# JOBファイルだけ処理をする。
+		if '.job_chain.xml' in job:				# JOB Chainファイルだけ処理をする。
 			if env.job_list[job] != "DEL":
 				file = "%s%s" % (source_path, job)
 				job = job.replace('.job_chain.xml','')
@@ -1247,7 +1252,6 @@ def show_info(dbg=0):
 	check_jobfile()
 
 	set_job_info(dbg)
-	set_job_chain_info(dbg)
 
 	if dbg in ["1"]:
 		for serv in env.process_class:
@@ -1408,7 +1412,6 @@ def set_jobs(dbg=0):
 	check_jobfile()
 
 	set_job_info(dbg=0)
-	set_job_chain_info(dbg=0)
 
 	msg ={}
 	for job in env.jos_job:
@@ -1423,20 +1426,7 @@ def set_jobs(dbg=0):
 
 		msg[env.process_class[job]].append(item)
 
-	for job in env.jos_job_chain:
-		name = job.replace('/','.')
-		name = name.replace('.job_chain.xml','')
-		name = name[1:]
-		hostid = env.zbx_server_list[env.process_class[job]]
-		itemname = "Jobscheduler\'s Job (%s)" % (name)
-		item = {"{#ITEM_NAME}":itemname,"{#JOB_NAME}":name}
-		if env.process_class[job] not in msg:
-			msg[env.process_class[job]] = []
-
-		msg[env.process_class[job]].append(item)
-
 	for k,v in msg.items():
-
 		cmd ="/usr/bin/zabbix_sender -z %s -s %s -k job.discovery -o \"{\\\"data\\\":%s}\"" % ( env.zbx_server, k, json.dumps(v).replace("\"","\\\""))
 		local(cmd, capture=True, shell=None)
 
