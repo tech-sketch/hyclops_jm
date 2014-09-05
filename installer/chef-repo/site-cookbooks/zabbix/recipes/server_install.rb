@@ -31,7 +31,7 @@ template '/etc/zabbix/web/zabbix.conf.php' do
 end
 
 bash 'execute initial sql' do
-  user "postgres"
+  user "root"
   code <<-EOH
   createuser zabbix -U postgres
   createdb -U postgres -O zabbix zabbix

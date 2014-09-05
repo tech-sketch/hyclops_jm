@@ -12,7 +12,7 @@ id >> $LOG
 date >> $LOG
 /usr/local/sbin/hyclops_jm show_info >> $LOG
 CODE=`echo $?`
-echo "Exit code $CODE >> $LOG
+echo "Exit code $CODE" >> $LOG
 
 exit $CODE
     </script>

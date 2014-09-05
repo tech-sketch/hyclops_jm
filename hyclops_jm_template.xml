@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2014-07-15T07:38:39Z</date>
+    <date>2014-09-05T11:04:34Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App JobScheduler Service</template>
-            <name>Template App JobScheduler Service</name>
+            <template>Template App JobScheduler</template>
+            <name>Template App JobScheduler</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -23,14 +23,14 @@
             </applications>
             <items>
                 <item>
-                    <name>JOS service is running</name>
-                    <type>3</type>
+                    <name>JobScheduler Job status monitoring</name>
+                    <type>2</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>net.tcp.service[tcp,,4444]</key>
-                    <delay>60</delay>
-                    <history>7</history>
+                    <key>jos_server_status</key>
+                    <delay>0</delay>
+                    <history>90</history>
                     <trends>365</trends>
                     <status>0</status>
                     <value_type>3</value_type>
@@ -62,12 +62,132 @@
                             <name>JobScheduler</name>
                         </application>
                     </applications>
-                    <valuemap>
-                        <name>Service state</name>
-                    </valuemap>
+                    <valuemap/>
+                    <logtimefmt/>
+                </item>
+                <item>
+                    <name>JobScheduler service is listenning.</name>
+                    <type>3</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>net.tcp.service[tcp,,4444]</key>
+                    <delay>60</delay>
+                    <history>90</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <delta>0</delta>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>JobScheduler</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
                 </item>
             </items>
-            <discovery_rules/>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>JobScheduler_job.discovery</name>
+                    <type>2</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>job.discovery</key>
+                    <delay>0</delay>
+                    <status>0</status>
+                    <allowed_hosts/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <filter>:</filter>
+                    <lifetime>30</lifetime>
+                    <description/>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>{#ITEM_NAME}</name>
+                            <type>2</type>
+                            <snmp_community/>
+                            <multiplier>0</multiplier>
+                            <snmp_oid/>
+                            <key>job[{#JOB_NAME}]</key>
+                            <delay>0</delay>
+                            <history>90</history>
+                            <trends>365</trends>
+                            <status>0</status>
+                            <value_type>3</value_type>
+                            <allowed_hosts/>
+                            <units/>
+                            <delta>0</delta>
+                            <snmpv3_contextname/>
+                            <snmpv3_securityname/>
+                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase/>
+                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                            <snmpv3_privpassphrase/>
+                            <formula>1</formula>
+                            <delay_flex/>
+                            <params/>
+                            <ipmi_sensor/>
+                            <data_type>0</data_type>
+                            <authtype>0</authtype>
+                            <username/>
+                            <password/>
+                            <publickey/>
+                            <privatekey/>
+                            <port/>
+                            <description/>
+                            <inventory_link>0</inventory_link>
+                            <applications>
+                                <application>
+                                    <name>JobScheduler</name>
+                                </application>
+                            </applications>
+                            <valuemap/>
+                            <logtimefmt/>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes/>
+                    <graph_prototypes/>
+                    <host_prototypes/>
+                </discovery_rule>
+            </discovery_rules>
             <macros/>
             <templates/>
             <screens/>
@@ -75,11 +195,21 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App JobScheduler Service:net.tcp.service[tcp,,4444].max(#3)}=0</expression>
-            <name>JobScheduler service is down on {HOST.NAME}</name>
+            <expression>{Template App JobScheduler:jos_server_status.last()}#0</expression>
+            <name>JobSCheduler's Job is failed</name>
             <url/>
             <status>0</status>
             <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>{Template App JobScheduler:net.tcp.service[tcp,,4444].max(#3)}=0</expression>
+            <name>JobScheduler service is not listenning on {HOST.NAME}</name>
+            <url/>
+            <status>0</status>
+            <priority>4</priority>
             <description/>
             <type>0</type>
             <dependencies/>
