@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<job  order="no" stop_on_error="no">
+    <script  language="shell">
+        <![CDATA[
+        ]]>
+#!/bin/bash
+
+LOG="/var/log/hyclops/send_job_elapse.log"
+id >> $LOG
+date >> $LOG
+/usr/local/sbin/hyclops_jm show_info >> $LOG
+CODE=`echo $?`
+echo "Exit code $CODE >> $LOG
+
+exit $CODE
+    </script>
+
+    <run_time let_run = "yes" repeat  = "300"/>
+</job>

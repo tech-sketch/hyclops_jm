@@ -38,6 +38,7 @@ bash 'execute initial sql' do
   psql -U zabbix zabbix < /usr/share/doc/zabbix-server-pgsql-2.2.*/create/schema.sql
   psql -U zabbix zabbix < /usr/share/doc/zabbix-server-pgsql-2.2.*/create/images.sql
   psql -U zabbix zabbix < /usr/share/doc/zabbix-server-pgsql-2.2.*/create/data.sql
+  sed -i -e "s|# php_value date.timezone Europe/Riga|php_value date.timezone Asia/Tokyo|" /etc/httpd/conf.d/zabbix.conf
   EOH
 end
 

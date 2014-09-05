@@ -3,7 +3,7 @@
 
 """
 ZabbixとJobSchedulerの連携プログラム
-  １．$Z4J_HOME/live配下にJobSchedulerに登録したJob情報を置くと
+  １．$JM_HOME/live配下にJobSchedulerに登録したJob情報を置くと
 　　１）JobSchedulerにJobを登録する。
     ２）ZabbixにJobとJob Chainの実行時間を監視するアイテムと実行結果を
         監視するアイテムとその実行結果からアラートを上げるトリガを登録
@@ -15,9 +15,9 @@ ZabbixとJobSchedulerの連携プログラム
 
 """
 
-__author__  = "Mitsuyuki Kato, OSSLab inc."
+__author__  = "TIS inc."
 __version__ = "1.00"
-__date__    = "2014/06/30"
+__date__    = "2014/xx/xx"
 
 
 #############################################################
@@ -68,9 +68,9 @@ env.zbx_pass="zabbix"
 
 #============================================================
 # DBへの接続情報
-env.psqldatabase='zbx4jos'
-env.psqluser='OSSLUSER'
-env.psqlpassword='OSSLUSER'
+env.psqldatabase='hyclops_jm'
+env.psqluser='HYCLOPS_JM_USER'
+env.psqlpassword='HYCLOPS_JM_USER'
 env.psqlhost='127.0.0.1'
 env.psqlport=5432
 
@@ -100,7 +100,7 @@ env.jos_last_id={}
 
 #============================================================
 def help():
-	print "zbx4jos <コマンド>[:パラメータ[,パラメータ].....]"
+	print "hyclops_jm <コマンド>[:パラメータ[,パラメータ].....]"
 	print ""
 	print "[コマンド]"
 	print "	show_info	： JobSchedulerからジョブ情報を取得してzabbix_senderで"
@@ -894,7 +894,7 @@ def jos_set_server(dbg=0):
 
 	check_jobfile()
 
-	path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
+	path = "%s/%s" % (os.getenv("JM_HOME"), "live")
 	if dbg in ["1","2"]:
 		print "PATH = ",path
 
@@ -1012,7 +1012,7 @@ def check_jobfile(dbg=0):
 	"""
 	check_jobfile
 	登録するジョブ情報と現状のジョブ情報を比較してジョブの登録、修正、削除を解析する
-	@param	None		： （$Z4J_HOME/live、$SCHEDULER_DATA/config/live配下のファイル）
+	@param	None		： （$JM_HOME/live、$SCHEDULER_DATA/config/live配下のファイル）
 
 	@reruen	None		： （env.job_listに情報を設定する）
 	"""
@@ -1040,7 +1040,7 @@ def check_jobfile(dbg=0):
 			regist_size[n] = os.stat(file).st_size
 			regist_time[n] = os.stat(file).st_mtime
 
-	dest_path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")	# 現状ファイルの情報取得
+	dest_path = "%s/%s" % (os.getenv("JM_HOME"), "live")	# 現状ファイルの情報取得
 	if dbg in ["1","2"]:
 		print "dest path = ",dest_path
 
@@ -1121,7 +1121,7 @@ def set_copy_jobs(dbg=0):
 	"""
 	set_copy_jobs
 	JobSchedulerへの登録情報ファイルと現状ファイルを合わせる
-	@param	None		： （$Z4J_HOME/live、$SCHEDULER_DATA/config/live配下のファイル）
+	@param	None		： （$JM_HOME/live、$SCHEDULER_DATA/config/live配下のファイル）
 
 	@param	None		： （$SCHEDULER_DATA/config/live配下のファイル）
 	"""
@@ -1132,7 +1132,7 @@ def set_copy_jobs(dbg=0):
 	if dbg in ["1","2"]:
 		print "Source directory PATH     = ",source_path
 
-	dest_path = "%s/%s" % (os.getenv("Z4J_HOME"), "live")
+	dest_path = "%s/%s" % (os.getenv("JM_HOME"), "live")
 	if dbg in ["1","2"]:
 		print "Destination directory PATH = ",dest_path
 
@@ -1143,7 +1143,7 @@ def set_copy_jobs(dbg=0):
 
 	for dir in  env.job_dirs:
 		if env.job_dirs[dir] == "ADD":
-			cmd = "mkdir %s%s" % (dest_path, dir)
+			cmd = "mkdir -p %s%s" % (dest_path, dir)
 
 			if dbg in ["1","2"]:
 				print(cmd)
@@ -1376,20 +1376,6 @@ def set_job_items(dbg=0):
 		hostid = env.zbx_server_list[env.process_class[job]]
 
 		print '  %s --> %s(%s)' % (name,env.process_class[job],hostid)
-
-
-	print "===<<< Set Items for JOS Server >>>==="	# ジョブステータス用のitem登録
-	for serv in env.zbx_server_list:
-		hostid = env.zbx_server_list[serv]
-		item = "jos_server_status_%s" % serv
-
-		print '  %s --> %s(%s)' % (item,serv,hostid)
-
-		zbx_setitems(item,hostid,dbg)
-							# Trigger追加処理
-		exp = "{%s:jos_server_status_%s.last()}#0" % (serv,serv)
-		desp = "jos_server_status_localhost_event"
-		zbx_settrigger(hostid,exp,desp,3,dbg)
 
 	set_jobs(dbg)
 	set_copy_jobs(dbg)				# 登録情報ファイルに現状ファイルを合わせる

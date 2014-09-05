@@ -7,4 +7,4 @@
 # All rights reserved - Do Not Redistribute
 #
 
-execute 'echo "zbx4jos \\"| /usr/local/sbin/zbx4jos_mail.sh\\"" >> /etc/aliases'
+execute 'echo "hyclops_jm \\"| /usr/local/sbin/hyclops_jm_mail.sh\\"" >> /etc/aliases'

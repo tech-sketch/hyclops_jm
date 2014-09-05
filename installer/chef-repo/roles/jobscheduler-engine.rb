@@ -19,7 +19,6 @@ override_attributes(
   }
 )
 run_list([
-"recipe[database::postgresql]",
 "recipe[java]",
 "recipe[jobscheduler::engine_install]"
 ])
