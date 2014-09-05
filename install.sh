@@ -13,7 +13,7 @@ fi
 
 # Check RHEL
 if [ `cat /etc/redhat-release | wc -l` -ne 1 ]; then
-  echo "Please install HyClops JobMonitoring on RHEL series."
+  echo "Please install HyClops JobMonitoring on RHEL series OS."
   exit 1
 fi
 
@@ -51,4 +51,11 @@ fi
 test -e /opt/sos-berlin.com/jobscheduler/scheduler/bin/jobscheduler.sh
 if [ `echo $?` -eq 1 ]; then
   chef-solo -c config/solo.rb -o "role[jobscheduler-engine]"
+fi
+
+# Install HyClops JobMonitoring
+test -e /home/scheduler/zbx4jos/fabfile.py
+if [ `echo $?` -eq 1 ]; then
+  cd $INSTALL_DIR
+  fab inst_z4j
 fi

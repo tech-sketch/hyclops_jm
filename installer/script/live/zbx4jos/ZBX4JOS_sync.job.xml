@@ -13,5 +13,5 @@ $Z4J_HOME/z4j_sync.sh
         ]]>
     </script>
 
-    <run_time let_run = "yes" repeat  = "1800"/>
+    <run_time let_run = "yes" repeat  = "1"/>
 </job>

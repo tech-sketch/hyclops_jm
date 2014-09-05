@@ -1593,7 +1593,7 @@ def gethostid(hostname,dbg=0):
 #============================================================
 def createdb(dbg=0):
 	"""
-	getitems
+	createdb
 	DBを作成する（初期化する)
 	@param	None		： 
 

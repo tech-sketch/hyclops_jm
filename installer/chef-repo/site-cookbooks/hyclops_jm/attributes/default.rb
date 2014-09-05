@@ -1,3 +1,8 @@
+default[:hyclops_jm][:jobscheduler][:engine_url] = '127.0.0.1'
+default[:hyclops_jm][:jobscheduler][:engine_port] = '4444'
+default[:hyclops_jm][:zabbix][:server_url] = '127.0.0.1'
+default[:hyclops_jm][:zabbix][:login_user] = 'Admin'
+default[:hyclops_jm][:zabbix][:login_pass] = 'zabbix'
 default[:hyclops_jm][:database][:type] = 'pgsql'
 default[:hyclops_jm][:database][:host] = '127.0.0.1'
 default[:hyclops_jm][:database][:port] = 5432

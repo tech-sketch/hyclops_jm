@@ -158,18 +158,13 @@ def inst_script(user='scheduler',pasd='scheduler'):
 	with lcd("script"):
 		dir = '/home/%s/zbx4jos' % (env.dbuser)
 		local( 'mkdir -p %s' % (dir) )
+		local( 'chown -R %s.%s %s/*' % (env.dbuser, env.dbuser, dir) )
+		local( 'chmod +x %s/*' % (dir) )
 		cmd = './mov.sh %s %s' % (env.dbuser, dir)
 		local( cmd )
-
-	d = "/home/%s/sos-berlin.com/jobscheduler/%s/config/live/zbx4jos" % (env.dbuser,env.dbuser)
-	local( 'mkdir -p %s' % (d) )
-	local( 'chown %s.%s %s' % (env.dbuser, env.dbuser, d) )
-
-	dir = '/home/%s/zbx4jos' % (env.dbuser)
-	with lcd(dir):
-		dir = '/home/%s/zbx4jos' % (env.dbuser)
-		local( 'chown -R %s.%s *' % (env.dbuser, env.dbuser) )
-		local( 'chmod +x *' )
+		js_live = "/home/%s/sos-berlin.com/jobscheduler/%s/config/live" % (env.dbuser,env.dbuser)
+		local( 'cp -fr %s/live/* %s' % (dir, js_live) )
+		local( 'chown %s:%s %s' % (env.dbuser, env.dbuser, js_live) )
 
 	with lcd("/usr/local/sbin"):
 		dir = '/home/%s/zbx4jos' % (env.dbuser)
@@ -183,7 +178,6 @@ def inst_script(user='scheduler',pasd='scheduler'):
 	local( 'chmod 0666 /var/log/zbx4jos.log*' )
 
 	env.warn_only=True
-
 
 def inst_jos(user='scheduler',pasd='scheduler'):
 	env.dbuser=user
@@ -246,18 +240,20 @@ def inst_z4j(user='scheduler',pasd='scheduler'):
 		if env.dbpass == 'scheduler':		# パスワードが指定されていない
 			env.dbpass=env.dbuser		# パスワードをユーザ名にする
 
-	add_user(user)
-	inst_psql(user)
-	inst_jos(user)
+	#add_user(user)
+	#inst_psql(user)
+	#inst_jos(user)
 	inst_script(user)
 
-	cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos createdb"' % (env.dbuser,env.dbuser)
-	local( cmd )
+	#cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos createdb"' % (env.dbuser,env.dbuser)
+	#local( cmd )
+	#local( 'export PATH=/usr/pgsql-9.3/bin:$PATH;pip install psycopg2' )
+
 
 	env.warn_only=False
 
-	cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos set_job_items"' % (env.dbuser,env.dbuser)
-	local( cmd )
+	#cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos set_job_items"' % (env.dbuser,env.dbuser)
+	#local( cmd )
 
 	print( '===========================================================================================' )
 	print( '実行する前に、以下の作業をしてください。' )
