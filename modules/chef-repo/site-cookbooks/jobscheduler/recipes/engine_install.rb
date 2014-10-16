@@ -17,6 +17,7 @@ mod_dir = "#{tmp_dir}/jobscheduler.#{node[:jobscheduler][:version][:major]}.#{no
 js_user = node[:jobscheduler][:user]
 
 # create database for jobscheduler
+=begin
 if node[:jobscheduler][:engine][:database][:type] == 'pgsql'
   connection_info = {
     :host => node[:jobscheduler][:engine][:database][:host],
@@ -37,6 +38,7 @@ if node[:jobscheduler][:engine][:database][:type] == 'pgsql'
     action :create
   end
 end
+=end
 
 remote_file tar_file do
   source node[:jobscheduler][:engine][:module_url]

@@ -20,7 +20,5 @@ default_attributes(
 )
 # override_attributes "node" => { "attribute" => [ "value", "value", "etc." ] }
 run_list(
-  "recipe[postgresql::server_install]",
-  "recipe[database::postgresql]",
-  "recipe[hyclops_jm::setup_db]"
+  "recipe[postgresql::server_install]"
 )

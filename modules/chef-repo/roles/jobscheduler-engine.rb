@@ -7,7 +7,7 @@ override_attributes(
   "jobscheduler" => {
     "version" => {
       "major" => "1.7",
-      "minor" => "4241"
+      "minor" => "4274"
     }
   },
   "java" => {

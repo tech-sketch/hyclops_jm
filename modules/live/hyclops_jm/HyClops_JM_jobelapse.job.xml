@@ -7,7 +7,7 @@
         ]]>
 #!/bin/bash
 
-LOG="/var/log/hyclops/send_job_elapse.log"
+LOG="/var/log/hyclops_jm/send_job_elapse.log"
 id >> $LOG
 date >> $LOG
 /usr/local/sbin/hyclops_jm show_info >> $LOG
