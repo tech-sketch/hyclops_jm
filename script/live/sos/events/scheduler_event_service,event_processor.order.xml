@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-
-<order>
-    <params>
-      <param name="action"                  value="process"/>
-      <param name="event_handler_filespec"  value="\.xsl$"/>
-    </params>
-    <run_time let_run="yes" repeat="300"/>
-</order>

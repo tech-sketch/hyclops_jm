@@ -2,271 +2,128 @@
 #-*- coding: utf-8 -*
 
 """
-	zbx4jos インストールスクリプト
-	Usage : fab inst_z4j<:ユーザ名>
-		・ユーザ名のデフォルトはscheduler
-		・指定されたユーザ名のパスワードはユーザ名と同じ
+  HyClop JobMonitoring install script
+  Usage : fab install<:username>
+    - Default user is scheduler
 """
 
-
 #############################################################
-# インポートモジュール
+# Import modules and initial settings
 #############################################################
-
-#============================================================
-# For Base
 from fabric.api import lcd, cd, local, run, env, hide, sudo
 import sys, os, os.path, time, fnmatch
 from datetime import datetime as dt
 from datetime import datetime
 
-env.warn_only=True
-
-env.dbuser='scheduler'
-env.dbpass='scheduler'
-env.dbpass2=''
-
 env.hosts = ['127.0.0.1']
-env.user = 'root'
-env.password = 'password'
 
 #============================================================
-
-def add_user(user='scheduler',pasd='scheduler'):
-	env.dbuser=user
-	env.dbpass=pasd
-	if env.dbuser != 'scheduler':			# ユーザ名が指定されて
-		if env.dbpass == 'scheduler':		# パスワードが指定されていない
-			env.dbpass=env.dbuser		# パスワードをユーザ名にする
-
-	cmd = 'id %s' % env.dbuser
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		cmd = 'openssl passwd -1 %s' % env.dbpass
-		res = sudo( cmd, user='root' )
-		env.dbpass2 = res.replace('$', '\$')
-
-		cmd = 'useradd %s -p"%s"' % (env.dbuser,env.dbpass2)
-		local(cmd)
-
-		env.warn_only=True
-
-	cmd = 'id %s' % 'zbx4jos'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		cmd = 'openssl passwd -1 %s' % 'zbx4jos'
-		res = sudo( cmd, user='root' )
-		env.dbpass2 = res.replace('$', '\$')
-
-		cmd = 'useradd %s -p"%s"' % ('zbx4jos',env.dbpass2)
-		local(cmd)
-
-		env.warn_only=True
-
-	cmd = 'grep %s /etc/sudoers' % env.dbuser
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('echo "%s ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers' % (env.dbuser) )
-
-		env.warn_only=True
-
-	cmd = 'grep %s /etc/sudoers' % 'postfix'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('echo "postfix ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers' )
-
-		env.warn_only=True
-
-	cmd = 'grep zbx4jos /etc/aliases'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('echo "zbx4jos         \\"| /usr/local/sbin/zbx4jos_mail.sh\\"" >> /etc/aliases' )
-
-		env.warn_only=True
-
-def inst_psql(user='scheduler',pasd='scheduler'):
-	env.dbuser=user
-	env.dbpass=pasd
-	if env.dbuser != 'scheduler':			# ユーザ名が指定されて
-		if env.dbpass == 'scheduler':		# パスワードが指定されていない
-			env.dbpass=env.dbuser		# パスワードをユーザ名にする
-
-	cmd = 'rpm -qa | grep pgdg-redhat93'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		local('rpm -i http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm')
-
-	cmd = 'yum list installed | grep postgresql93'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('yum -y install postgresql93-server postgresql93-devel postgresql93-contrib')
-		local('service postgresql-9.3 initdb')
-
-		local('chkconfig postgresql-9.3 on')
-		local('cp pg_hba.conf /var/lib/pgsql/9.3/data/pg_hba.conf')
-
-		env.warn_only=True
-
-	cmd = 'service postgresql-9.3 status'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('service postgresql-9.3 start')
-
-		env.warn_only=True
-
-	cmd = 'echo "create user %s createdb password \'%s\' login;"| su - postgres -c psql' % (env.dbuser,env.dbpass)
-	local( cmd )
-
-	cmd = 'grep pgsql-9.3 /etc/bashrc'
-	res = sudo( cmd, user='root' )
-	if res.return_code != 0:
-		env.warn_only=False
-
-		local('echo "export PATH=/usr/pgsql-9.3/bin:\$PATH" >> /etc/bashrc' )
-
-		env.warn_only=True
-
-	env.warn_only=False
-
-	local( 'export PATH=/usr/pgsql-9.3/bin:$PATH;pip install psycopg2' )
-
-	env.warn_only=True
-
-def inst_script(user='scheduler',pasd='scheduler'):
-	env.dbuser=user
-	env.dbpass=pasd
-	if env.dbuser != 'scheduler':			# ユーザ名が指定されて
-		if env.dbpass == 'scheduler':		# パスワードが指定されていない
-			env.dbpass=env.dbuser		# パスワードをユーザ名にする
-
-	env.warn_only=False
-
-	with lcd("script"):
-		dir = '/home/%s/zbx4jos' % (env.dbuser)
-		local( 'mkdir -p %s' % (dir) )
-		cmd = './mov.sh %s %s' % (env.dbuser, dir)
-		local( cmd )
-
-	d = "/home/%s/sos-berlin.com/jobscheduler/%s/config/live/zbx4jos" % (env.dbuser,env.dbuser)
-	local( 'mkdir -p %s' % (d) )
-	local( 'chown %s.%s %s' % (env.dbuser, env.dbuser, d) )
-
-	dir = '/home/%s/zbx4jos' % (env.dbuser)
-	with lcd(dir):
-		dir = '/home/%s/zbx4jos' % (env.dbuser)
-		local( 'chown -R %s.%s *' % (env.dbuser, env.dbuser) )
-		local( 'chmod +x *' )
-
-	with lcd("/usr/local/sbin"):
-		dir = '/home/%s/zbx4jos' % (env.dbuser)
-		local( 'rm -f zbx4jos' )
-		local( 'ln -s %s/zbx4jos .' % (dir) )
-		local( 'rm -f zbx4jos_mail.sh' )
-		local( 'ln -s %s/zbx4jos_mail.sh .' % (dir) )
-
-	local( 'touch /var/log/zbx4jos.log' )
-	local( 'chown %s.%s /var/log/zbx4jos.log' % (env.dbuser, env.dbuser) )
-	local( 'chmod 0666 /var/log/zbx4jos.log*' )
-
-	env.warn_only=True
-
-
-def inst_jos(user='scheduler',pasd='scheduler'):
-	env.dbuser=user
-	env.dbpass=pasd
-	if env.dbuser != 'scheduler':			# ユーザ名が指定されて
-		if env.dbpass == 'scheduler':		# パスワードが指定されていない
-			env.dbpass=env.dbuser		# パスワードをユーザ名にする
-
-	cmd = 'su - %s -c "createdb %s"' % (env.dbuser,env.dbuser)
-	local( cmd )
-	cmd = 'su - %s -c "createdb zbx4jos"' % (env.dbuser)	# 空のDBを作成
-	local( cmd )
-
-	env.warn_only=False
-
-	cmd = 'echo "alter user %s set standard_conforming_strings=off;"| su - %s -c psql' % (env.dbuser,env.dbuser)
-	local( cmd )
-	cmd = 'echo "alter user %s set bytea_output = \'escape\';"| su - %s -c psql' % (env.dbuser,env.dbuser)
-	local( cmd )
-	cmd = 'su - %s -c "createlang -U %s -l %s"' % (env.dbuser,env.dbuser,env.dbuser)
-	local( cmd )
-
-	cmd ="sed 's/OSSLUSER/%s/g' jos_inst.xml > /var/tmp/inst.xml" % (env.dbuser)
-	local( cmd )
-
-	local( 'mkdir -p /opt' )
-	local( 'chmod 0777 /opt' )
-	local( 'yum -y install wget' )
-
-	env.warn_only=True
-
-	with lcd("/var/tmp"):
-		flag = os.path.exists("/var/tmp/jobscheduler_linux-x64.1.6.4043.tar.gz")
-
-		if flag == True:
-			print "ファイルは存在します"
-	##		local( 'rm -f jobscheduler_linux-x64.1.6.4043.tar.gz' )
-		else:
-			env.warn_only=True
-
-			local("wget http://sourceforge.net/projects/jobscheduler/files/Archive/JobScheduler%20since%201.6/jobscheduler_linux-x64.1.6.4043.tar.gz" )
-
-			env.warn_only=False
-
-		env.warn_only=True
-
-		cmd = 'su - %s -c "cd /var/tmp ; tar zxf jobscheduler_linux-x64.1.6.4043.tar.gz"' % (env.dbuser)
-		local( cmd )
-
-		env.warn_only=False
-
-	with lcd("/var/tmp/jobscheduler.1.6.4043"):
-		cmd = 'su - %s -c "cd /var/tmp/jobscheduler.1.6.4043 ; ./setup.sh -u /var/tmp/inst.xml"' % (env.dbuser)
-		local( cmd )
-
-def inst_z4j(user='scheduler',pasd='scheduler'):
-	env.dbuser=user
-	env.dbpass=pasd
-	if env.dbuser != 'scheduler':			# ユーザ名が指定されて
-		if env.dbpass == 'scheduler':		# パスワードが指定されていない
-			env.dbpass=env.dbuser		# パスワードをユーザ名にする
-
-	add_user(user)
-	inst_psql(user)
-	inst_jos(user)
-	inst_script(user)
-
-	cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos createdb"' % (env.dbuser,env.dbuser)
-	local( cmd )
-
-	env.warn_only=False
-
-	cmd = 'su - %s -c "cd /home/%s/zbx4jos ; zbx4jos set_job_items"' % (env.dbuser,env.dbuser)
-	local( cmd )
-
-	print( '===========================================================================================' )
-	print( '実行する前に、以下の作業をしてください。' )
-	print( '  1) ZABBIXサーバに外部スクリプトとしてzbx4jos_sender.shを定期的に実行するアイテムを設定をしてください。' )
-	print( '===========================================================================================' )
-
-def help():
-	with hide('running','user'):
-		local('fab -l')
+# private functions
+#============================================================
+def _set_user(user, passwd):
+  env.jm_user = user
+  env.jm_passwd = passwd
+
+def _allow_error():
+  env.warn_only = True
+
+def _deny_error():
+  env.warn_only = False
 
 #============================================================
+# public functions
+#============================================================
+def add_user(user, passwd):
+  # Add hyclops jm user
+  _allow_error()
+  res = run('id %s' % user)
+  _deny_error()
+  if res.return_code != 0:
+    local('useradd %s -p"%s"' %(user, passwd))
 
+def sudo_to_user(user):
+  _allow_error()
+  res = run('grep %s /etc/sudoers || grep -r %s /etc/sudoers.d' % (user, user))
+  _deny_error()
+  if res.return_code != 0:
+    local('echo "%s  ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/%s' % (user, user))
+    local('echo "Defaults:%s !requiretty,env_reset" >> /etc/sudoers.d/%s' % (user, user))
+
+
+def setup_postfix():
+  _allow_error()
+  res = run('grep hyclops_jm /etc/aliases')
+  _deny_error()
+  if res.return_code != 0:
+    local('echo "hyclops_jm: | \\"/usr/local/sbin/hyclops_jm_mail.sh\\"" >> /etc/aliases')
+    local('newaliases')
+
+def setup_db():
+  local("export PATH=/usr/pgsql-%s/bin:$PATH;pip install psycopg2" % env.pgsql_version)
+
+  sqls = ["create table sysinfo (name text,value text);",
+    "alter table sysinfo owner to %s;" % env.js_user,
+    "create table jobid_tbl (job text,lastid text);",
+    "alter table jobid_tbl owner to %s;" % env.js_user,
+    "insert into sysinfo (name,value) values ('job_server','%s');" % env.js_host,
+    "insert into sysinfo (name,value) values ('job_port','%s');" % env.js_port,
+    "insert into sysinfo (name,value) values ('zbx_server','%s');" % env.zbx_host,
+    "insert into sysinfo (name,value) values ('zbx_login','%s');" % env.zbx_login_user,
+    "insert into sysinfo (name,value) values ('zbx_pass','%s');" % env.zbx_login_passwd,
+    "insert into sysinfo (name,value) values ('jos_timeout','3');"]
+  psql = "psql -U %s -h %s -p %s -c" % (env.db_user, env.db_host, env.db_port)
+
+  _allow_error()
+  local("%s 'drop database %s'" % (psql, env.jm_user))
+  _deny_error()
+  local("%s 'create database %s owner = %s'" % (psql, env.jm_user, env.js_user))
+
+  for sql in sqls:
+    psql = "psql -U %s -h %s -p %s -d %s -c" % (env.db_user, env.db_host, env.db_port, env.jm_user)
+    local("%s \"%s\"" % (psql, sql))
+
+def setup_scripts():
+  log_dir = '/var/log/hyclops_jm'
+  jm_home = "/home/%s/hyclops_jm" % env.js_user
+  js_data = "/home/%s/sos-berlin.com/jobscheduler/%s" % (env.js_user, env.js_id)
+
+  local("mkdir -p %s" % log_dir)
+  local("mkdir -p %s/live" % jm_home)
+  local("sed 's/HYCLOPS_JM_USER/%s/g' modules/scripts/fabfile.py > %s/fabfile.py" % (env.js_user, jm_home))
+  local("chown -R %s:%s %s" % (env.js_user, env.js_user, log_dir))
+  local("chown -R %s:%s %s" % (env.js_user, env.js_user, jm_home))
+  local("sed 's/HYCLOPS_JM_USER/%s/g' modules/scripts/hyclops_jm > /usr/local/sbin/hyclops_jm" % env.js_user)
+  local("sed 's/HYCLOPS_JM_USER/%s/g' modules/scripts/hyclops_jm_mail.sh > /usr/local/sbin/hyclops_jm_mail.sh" % env.js_user)
+  local("chown %s:%s /usr/local/sbin/hyclops_jm*" % (env.js_user, env.js_user))
+  local("chmod +x /usr/local/sbin/hyclops_jm*")
+
+  local("mkdir -p %s/config/live/hyclops_jm" % js_data)
+  local("chown %s:%s %s/config/live/hyclops_jm" % (env.js_user, env.js_user, js_data))
+  files = local("cd modules; find live -type f", capture=True)
+  for file in files.split('\n'):
+    local("sed 's/HYCLOPS_JM_USER/%s/g' modules/%s > %s/config/%s" % (env.js_user, file, js_data, file))
+
+def install(user = 'hyclops_jm', passwd = 'hyclops_jm'):
+  if 'js_user' not in env:
+    print 'Usage: fab -c hyclops_jm.conf install'
+    return False
+
+  _deny_error()
+  _set_user(user, passwd)
+
+  add_user(user, passwd)
+  add_user(env.js_user, env.js_passwd)
+  sudo_to_user(env.js_user)
+  setup_postfix()
+  setup_db()
+  setup_scripts()
+
+  print "================================================="
+  print "= Installing HyClops JM is completed!!          = "
+  print "= You go to next step.                          = "
+  print "= - Access the Zabbix web interface.            = "
+  print "=   - example: http://your-domain/zabbix        = "
+  print "= - Create Host name [localhost]                = "
+  print "= - Import Template and attach to localhost     = "
+  print "= - So you can get HyClops JM functions!!       = "
+  print "================================================="

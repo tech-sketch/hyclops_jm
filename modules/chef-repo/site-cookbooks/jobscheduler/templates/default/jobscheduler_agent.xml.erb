@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+XML configuration file for Job Scheduler Agent
+
+The Job Scheduler is available with a dual licensing model.
+- GNU GPL 2.0 License (see http://www.gnu.org/licenses/gpl-2.0.html)
+- Job Scheduler Commercial License (see licence.txt)
+
+The setup asks you for the desired license model 
+(see <entry key="licenceOptions" .../> below).
+
+If you call the setup with this XML file then you accept 
+at the same time the terms of the chosen license agreement. 
+-->
+<AutomatedInstallation langpack="eng">
+    <com.izforge.izpack.panels.UserInputPanel id="home">
+        <userInput/>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="licences">
+        <userInput>
+        
+            <!-- Select the license model (GPL or Commercial) -->
+            <entry key="licenceOptions" value="GPL"/>
+            
+            <!-- If you selected GPL as license model than the licence must be empty.
+                 Otherwise please enter a license key if available.
+                 It is also possible to modify the license key later. -->
+            <entry key="licence" value=""/>
+            
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.HTMLLicencePanel id="gpl_licence"/>
+    <com.izforge.izpack.panels.HTMLLicencePanel id="commercial_licence"/>
+    <com.izforge.izpack.panels.TargetPanel id="target">
+        
+        <!-- SELECT THE INSTALLATION PATH FOR THE BINARIES AND LIBRARIES
+             The installation expands this path with the Scheduler ID as subdirectory.
+             It must be absolute!
+             Default paths are
+             /opt/sos-berlin.com/jobscheduler for Unix
+             C:\Program Files\sos-berlin.com\jobscheduler for Windows -->
+      <installpath><%=node[:jobscheduler][:agent][:scheduler_data]%></installpath>
+    
+    </com.izforge.izpack.panels.TargetPanel>
+    <com.izforge.izpack.panels.UserPathPanel id="userpath">
+        
+        <!-- SELECT THE DATA PATH FOR CONFIGURATION AND LOG FILES
+             The installation expands this path with the Scheduler ID as subdirectory.
+             It must be absolute!
+             Default paths are
+             /home/[user]/sos-berlin.com/jobscheduler for Unix
+             C:\ProgramData\sos-berlin.com\jobscheduler or
+             C:\Documents and Settings\All Users\Application Data\sos-berlin.com\jobscheduler resp. for Windows -->
+         <UserPathPanelElement><%=node[:jobscheduler][:agent][:scheduler_home]%></UserPathPanelElement>
+    
+    </com.izforge.izpack.panels.UserPathPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="network">
+        <userInput>
+            
+            <!-- Choose (yes or no) wether the JobScheduler should be started at the end of the installation -->
+            <entry key="launchScheduler" value="yes"/>
+            
+            <!-- Enter the name or ip address of the host on which the Job Scheduler is operated -->
+            <entry key="schedulerHost" value="<%=node[:jobscheduler][:agent][:server_host]%>"/>
+            
+            <!-- To enter a Job Scheduler ID is required.
+                 Please omit special characters like: / \ : ; * ? ! $ % & " < > ( ) | ^ 
+                 The IDs of multiple instances of the Job Scheduler must be unique per server. 
+                 The Job Scheduler ID expands the above installation paths as subdirectory. -->
+            <entry key="schedulerId" value="scheduler_agent"/>
+            
+            <!-- Enter the port for Jetty HTTP -->
+            <entry key="jettyHTTPPort" value="40444"/>
+            
+            <!-- Enter the port for Jetty HTTPS -->
+            <entry key="jettyHTTPSPort" value="48444"/>
+            
+            <!-- Enter host name or ip addresse. 
+                 To enable all hosts in your network to access the Job Scheduler enter '0.0.0.0'. -->
+            <entry key="schedulerAllowedHost" value="<%=node[:jobscheduler][:agent][:allow_host]%>"/>
+            
+            <!-- Enter the port -->
+            <entry key="schedulerPort" value="4444"/>
+        
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.InstallPanel id="install"/>
+    <com.izforge.izpack.panels.ProcessPanel id="process"/>
+    <com.izforge.izpack.panels.FinishPanel id="finish"/>
+</AutomatedInstallation>

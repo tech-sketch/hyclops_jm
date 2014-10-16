@@ -1,0 +1,21 @@
+#!/bin/bash
+
+LOGFILE="/var/log/hyclops_jm/hyclops_jm.log"
+
+.  /opt/sos-berlin.com/jobscheduler/HYCLOPS_JM_USER/bin/jobscheduler_environment_variables.sh
+export JM_HOME="/home/HYCLOPS_JM_USER/hyclops_jm"
+cd $JM_HOME
+
+cmd=$1
+
+if [ "$cmd" == "" ]
+then
+	cmd="help"
+fi
+
+D=`date`
+I=`id`
+echo -n "[ $D ] : Access ID is $I : Command is $cmd $2 $3 $4 $5 $6 $7" >> $LOGFILE
+fab $cmd 2>&1 | grep -v "Done." | tee -a $LOGFILE
+
+#
