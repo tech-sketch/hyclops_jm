@@ -3,7 +3,7 @@
 <job  order="yes" stop_on_error="no">
     <params>
       <include live_file="target_zabbix_host.xml" node=""/>
-      <param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/> 
+      <param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/>
       <param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/>
     </params>
     <script  language="shell">
@@ -25,29 +25,43 @@ ESCAPED_TRIGGER_COND=`echo "$SCHEDULER_PARAM_TRIGGER_COND" | sed -e "s/,/\\\\\\\
 
 # setting hostid registered in zabbix
 ZABBIX_HOSTID=`fab gethostid:"$SCHEDULER_PARAM_ZABBIX_HOST" | head -1`
-echo "Success of getting zabbix hostid. $SCHEDULER_PARAM_ZABBIX_HOST's zabbix hostid is $ZABBIX_HOSTID"
+if [ -z "$ZABBIX_HOSTID" ]; then
+  echo "[error] Zabbix host [$SCHEDULER_PARAM_ZABBIX_HOST] is not found error."
+  exit 1
+fi
+echo "[info] Success of getting Zabbix hostid. $SCHEDULER_PARAM_ZABBIX_HOST's zabbix hostid is $ZABBIX_HOSTID"
 
 # setting triggerid disabled by this job
-SOURCE_TRIGGERID=`fab gettriggerid:hostid=$ZABBIX_HOSTID,msg="$ESCAPED_TRIGGER_NAME" | head -1`
+SOURCE_TRIGGERID=`fab zbx_get_trigger_id:hostid=$ZABBIX_HOSTID,trigger_name="$ESCAPED_TRIGGER_NAME" | head -1`
+if [ -z "$SOURCE_TRIGGERID" ]; then
+  echo "[error] Zabbix modify source trigger [$SCHEDULER_PARAM_TRIGGER_NAME] is not found error."
+  exit 1
+fi
+echo "[info] Success of getting Zabbix modify source triggerid $SOURCE_TRIGGERID."
 
 # disable and adding triggers
-fab trigger_switch:"$ZABBIX_HOSTID","$ESCAPED_TRIGGER_NAME","$ESCAPED_TRIGGER_COND" > /dev/null 2>&1
+RET_VAL=`fab trigger_switch:"$ZABBIX_HOSTID","$ESCAPED_TRIGGER_NAME","$ESCAPED_TRIGGER_COND" | head -1`
+
+if [ $RET_VAL -eq 1 ]; then
+  echo "[error] Trigger switch process is failed. Please check the format of source trigger name and dest trigger condition."
+  exit 1
+fi
 
 # setting triggerid adding by HyClops JM
-DEST_TRIGGERID=`fab gettriggerid:hostid=$ZABBIX_HOSTID,msg="Switched by HyClops_JobMonitoring($ESCAPED_TRIGGER_NAME)" | head -1`
+DEST_TRIGGERID=`fab zbx_get_trigger_id:hostid=$ZABBIX_HOSTID,trigger_name="Switched by HyClops_JobMonitoring($ESCAPED_TRIGGER_NAME)" | head -1`
 
 # setting trigger id to JobScheduler's environment file
 if [ -z "$SCHEDULER_PARAM_SOURCE_TRIGGERID" ]; then
-  echo "SOURCE_TRIGGERID=$SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
-  echo "DEST_TRIGGERID=$DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "[info] SOURCE_TRIGGERID=$SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "[info] DEST_TRIGGERID=$DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
 else
-  echo "SOURCE_TRIGGERID=$SCHEDULER_PARAM_SOURCE_TRIGGERID $SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
-  echo "DEST_TRIGGERID=$SCHEDULER_PARAM_DEST_TRIGGERID $DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "[info] SOURCE_TRIGGERID=$SCHEDULER_PARAM_SOURCE_TRIGGERID $SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "[info] DEST_TRIGGERID=$SCHEDULER_PARAM_DEST_TRIGGERID $DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
 fi
 
-echo "Disabled trigger id is $SOURCE_TRIGGERID"
-echo "Enabled trigger id is $DEST_TRIGGERID"
-echo "Success of trigger switching."
+echo "[info] Disabled trigger id is $SOURCE_TRIGGERID"
+echo "[info] Enabled trigger id is $DEST_TRIGGERID"
+echo "[info] Success of trigger switching."
         ]]>
     </script>
     <run_time />

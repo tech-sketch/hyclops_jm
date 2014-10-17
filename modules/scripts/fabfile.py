@@ -113,7 +113,8 @@ def help():
 	print "				　 rule		： 無効後に登録するトリガ条件"
 	print "	trigger_ret	： trigger_switchで設定した内容を元に戻す"
 	print "		[パラメータ]	： hostid	： 有効にするホストID"
-	print "				　 msg		： 元に戻すトリガ名"
+	print "				source_triggerid		: 有効にするトリガID"
+	print "				dest_triggerid		: 削除するトリガID"
 
 
 #############################################################
@@ -546,9 +547,9 @@ def zbx_gettrigger(hostid="10084",dbg=0):
 
 #============================================================
 
-def zbx_settrigger(hostid,exp,desp,pri=3,dbg=0):
+def zbx_set_trigger(hostid, exp, desp, pri=3, dbg=0):
 	"""
-	zbx_settrigger
+	zbx_set trigger
 	Zabbixに指定したホストに指定したtriggerを設定する
 	@param	hostid		： 設定するするトリガのhostid
 	@param	exp		： 設定するするトリガ名
@@ -688,12 +689,12 @@ def zbx_gethost(hostname,dbg=0):
 
 #============================================================
 
-def gettriggerid(hostid,msg,dbg=0):
+def zbx_get_trigger_id(hostid, trigger_name, dbg=0):
 	"""
-	gettriggerid
-	Trigger一覧を取得する
+	zbx_get_trigger_id
+	ZabbixのTriggerでtrigger_nameに一致するTriggerを取得
 	@param	hostid		： 確認するhost名
-	@param	msg		： 確認するトリガ情報
+	@param	trigger_name		： 確認するトリガ情報
 
 	@reruen	recvbuf		： Zabbixから取得した情報
 	"""
@@ -704,7 +705,7 @@ def gettriggerid(hostid,msg,dbg=0):
 	recvkeys = recvbuf.keys()
 
 	if dbg == '1':
-		print " Search msg : ",msg
+		print " Search trigger_name : ",trigger_name
 
 	ret = ''
 
@@ -718,7 +719,7 @@ def gettriggerid(hostid,msg,dbg=0):
 				reskeys = results.keys()
 				if dbg == '1':
 					print "  description : ",results['description']
-				if msg == results['description']:
+				if trigger_name == results['description']:
 					ret = results['triggerid']
 					if dbg == '1':
 						print "     Matched"
@@ -765,7 +766,7 @@ def gettrigger_enable(tid,dbg=0):
 
 #============================================================
 
-def gettrigger_disable(tid,dbg=0):
+def zbx_trigger_disable(tid,dbg=0):
 	"""
 	gettrigger_enable
 	Triggerを無効にする
@@ -1307,17 +1308,6 @@ def show_info(dbg=0):
 						print '                  end_time_2 = %s' % end_time_2
 						print cmd
 
-# 不要な機能のため、コメントアウト
-#					if exit_code <> '':		# タスクIDを送信
-#						item = "jos_server_status_%s" % (env.process_class[job])
-#				##		exit_msg = '\\"Task ID %s : Exit %s\\"' % (task,exit_code)
-#						exit_msg = '%s' % (exit_code)
-#						cmd ="echo -n -e %s %s %s %s | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, exit_msg, env.zbx_server)
-#						local( cmd )
-#
-#						if dbg in ["1"]:
-#							print cmd
-
 					jid_flg = 0
 					for jid in last_id:
 						if jid == job:
@@ -1418,25 +1408,38 @@ def set_jobs(dbg=0):
 
 #============================================================
 
-def trigger_switch(hostid,msg,rule,dbg=0):
+def trigger_switch(hostid, source_trigger_name, rule, dbg=0):
 	"""
 	trigger_switch
 	現状のTriggerを無効にして代わりを設定する
 	@param	hostid		： 無効にするホストID
-	@param	msg		： 無効にするトリガ名
+	@param	source_trigger_name		： 無効にするトリガ名
 	@param	rule		： 無効後に登録するトリガ条件
 
-	@param	None		： 
+	@return	0 or 1		：0 => success, 1 => error
 	"""
 
-	triggerid = gettriggerid(hostid,msg,dbg)
-	gettrigger_disable(triggerid,dbg)
+	success = 0
+	error = 1
 
-	desp = "Switched by HyClops_JobMonitoring(%s)" % msg
+	new_trigger_name = "Switched by HyClops_JobMonitoring(%s)" % source_trigger_name
+	ret = zbx_set_trigger(hostid, rule, new_trigger_name, 3, dbg)
+	if ret.has_key(u'error'):
+		print error
+		return error
 
-	zbx_settrigger(hostid,rule,desp,3,dbg)
+	triggerid = zbx_get_trigger_id(hostid, source_trigger_name, dbg)
 
-	return
+	if not triggerid:
+		new_trigger_id = ret[u'result'][u'triggerids'][0]
+		zbx_deltrigger(new_trigger_id)
+		print error
+		return error
+
+	zbx_trigger_disable(triggerid, dbg)
+
+	print success
+	return success
 
 #============================================================
 
