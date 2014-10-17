@@ -40,7 +40,7 @@ fi
 echo "[info] Success of getting Zabbix modify source triggerid $SOURCE_TRIGGERID."
 
 # disable and adding triggers
-RET_VAL=`fab trigger_switch:"$ZABBIX_HOSTID","$ESCAPED_TRIGGER_NAME","$ESCAPED_TRIGGER_COND" | head -1`
+RET_VAL=`fab trigger_switch:"$ZABBIX_HOSTID","$ESCAPED_TRIGGER_NAME","$ESCAPED_TRIGGER_COND" | tail -3 | head -1`
 
 if [ $RET_VAL -eq 1 ]; then
   echo "[error] Trigger switch process is failed. Please check the format of source trigger name and dest trigger condition."
@@ -52,11 +52,11 @@ DEST_TRIGGERID=`fab zbx_get_trigger_id:hostid=$ZABBIX_HOSTID,trigger_name="Switc
 
 # setting trigger id to JobScheduler's environment file
 if [ -z "$SCHEDULER_PARAM_SOURCE_TRIGGERID" ]; then
-  echo "[info] SOURCE_TRIGGERID=$SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
-  echo "[info] DEST_TRIGGERID=$DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "SOURCE_TRIGGERID=$SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "DEST_TRIGGERID=$DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
 else
-  echo "[info] SOURCE_TRIGGERID=$SCHEDULER_PARAM_SOURCE_TRIGGERID $SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
-  echo "[info] DEST_TRIGGERID=$SCHEDULER_PARAM_DEST_TRIGGERID $DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "SOURCE_TRIGGERID=$SCHEDULER_PARAM_SOURCE_TRIGGERID $SOURCE_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
+  echo "DEST_TRIGGERID=$SCHEDULER_PARAM_DEST_TRIGGERID $DEST_TRIGGERID" >> $SCHEDULER_RETURN_VALUES
 fi
 
 echo "[info] Disabled trigger id is $SOURCE_TRIGGERID"
