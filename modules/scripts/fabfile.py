@@ -766,7 +766,7 @@ def gettrigger_enable(tid,dbg=0):
 
 #============================================================
 
-def zbx_trigger_disable(tid,dbg=0):
+def zbx_trigger_disable(tid, dbg=0):
 	"""
 	gettrigger_enable
 	Triggerを無効にする
@@ -1422,21 +1422,24 @@ def trigger_switch(hostid, source_trigger_name, rule, dbg=0):
 	success = 0
 	error = 1
 
-	new_trigger_name = "Switched by HyClops_JobMonitoring(%s)" % source_trigger_name
-	ret = zbx_set_trigger(hostid, rule, new_trigger_name, 3, dbg)
-	if ret.has_key(u'error'):
+	source_triggerid = zbx_get_trigger_id(hostid, source_trigger_name, dbg)
+
+	if not source_triggerid:
 		print error
 		return error
 
-	triggerid = zbx_get_trigger_id(hostid, source_trigger_name, dbg)
+	new_trigger_name = "Switched by HyClops_JobMonitoring(%s)" % source_trigger_name
+	new_ret = zbx_set_trigger(hostid, rule, new_trigger_name, 3, dbg)
+	if new_ret.has_key(u'error'):
+		print error
+		return error
 
-	if not triggerid:
-		new_trigger_id = ret[u'result'][u'triggerids'][0]
+	source_ret = zbx_trigger_disable(source_triggerid, dbg)
+	if source_ret.has_key(u'error'):
+		new_trigger_id = new_ret[u'result'][u'triggerids'][0]
 		zbx_deltrigger(new_trigger_id)
 		print error
 		return error
-
-	zbx_trigger_disable(triggerid, dbg)
 
 	print success
 	return success
