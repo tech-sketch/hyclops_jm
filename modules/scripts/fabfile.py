@@ -1341,9 +1341,11 @@ def set_job_items(dbg=0):
 
 	getdbinfo(dbg)
 
+	check_jobfile()
+	set_copy_jobs(dbg)				# 登録情報ファイルに現状ファイルを合わせる
+
 	jos_set_server(dbg)
 	gethosts(dbg)
-	check_jobfile()
 
 	set_job_info(dbg=0)
 	set_job_chain_info(dbg=0)
@@ -1368,7 +1370,6 @@ def set_job_items(dbg=0):
 		print '  %s --> %s(%s)' % (name,env.process_class[job],hostid)
 
 	set_jobs(dbg)
-	set_copy_jobs(dbg)				# 登録情報ファイルに現状ファイルを合わせる
 
 #============================================================
 

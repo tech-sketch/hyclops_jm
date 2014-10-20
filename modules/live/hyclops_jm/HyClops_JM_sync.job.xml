@@ -6,6 +6,7 @@
         <![CDATA[
 #!/bin/bash
 
+.  /opt/sos-berlin.com/jobscheduler/HYCLOPS_JM_USER/bin/jobscheduler_environment_variables.sh
 export JM_HOME="/home/HYCLOPS_JM_USER/hyclops_jm"
 cd $JM_HOME
 
