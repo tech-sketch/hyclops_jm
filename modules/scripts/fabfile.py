@@ -1260,6 +1260,7 @@ def show_info(dbg=0):
 
 	root = jos_show_state(dbg)
 
+	elapses = []
 	org_time = dt.strptime('1970-01-01 07:00:00','%Y-%m-%d %H:%M:%S')
 	for e in root.findall('answer/state/jobs/job/'):	# ジョブの情報を取得
 		for name,job in e.items():
@@ -1280,32 +1281,39 @@ def show_info(dbg=0):
 
 				root = jos_show_history(job,last_id[job], dbg)
 				for elem in root.findall('answer/history/history.entry/'):
+					start_time_ut = -1
+					end_time_ut = -1
+					task = ''
 					exit_code = ''
 					for n,t in elem.items():
 						if n == 'start_time':
 							start_time = dt.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')
-							start_time_1 = int(time.mktime(time.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')))
+							start_time_ut = int(time.mktime(time.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')))
 						elif n == 'end_time':
 							end_time = dt.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')
-							end_time_1 = int(time.mktime(time.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')))
-							end_time_2 = end_time_1 + 32400		# 9時間加算
+							end_time_ut = int(time.mktime(time.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')))
 						elif n == 'task':
 							task = t
 						elif n == 'exit_code':
 							exit_code = t
 
-					elapse = end_time_1 - start_time_1
+					# Re loop if job is executing
+					if start_time_ut == -1 or end_time_ut == -1:
+						continue
 
-								# Zabbixに情報を送信
+					elapse = end_time_ut - start_time_ut
+					if elapse < 0:
+						print '[error] Job elapse is minus error occurred in job[',job,'],start_time[',start_time,'], end_time[',end_time,'], elapse[',elapse,']'
+						continue
+
 					item = job.replace('/','.')
 					item = item[1:]
 
-					cmd ="echo -n -e '%s job[%s] %s %s' | /usr/bin/zabbix_sender -z %s -T -i -" % ( env.process_class[job], item, end_time_2, elapse, env.zbx_server)
-					local( cmd )
+					elapses.append("%s job[%s] %s %s" % ( env.process_class[job], item, end_time_ut, elapse))
 
 					if dbg in ["1"]:
 						print '    ',task,' : ',exit_code,' :',start_time,' : ',end_time,' -> ',elapse
-						print '                  end_time_2 = %s' % end_time_2
+						print '                  end_time_ut = %s' % end_time_ut
 						print cmd
 
 					jid_flg = 0
@@ -1320,6 +1328,8 @@ def show_info(dbg=0):
 					if jid_flg == 0:
 						last_id[job] = int(task, 10)
 
+	cmd ="echo -e '%s' | /usr/bin/zabbix_sender -z %s -T -i -" % ( "\n".join(elapses), env.zbx_server)
+	local( cmd )
 	jos_set_last_id(last_id,dbg)
 
 	if dbg in ["1"]:
