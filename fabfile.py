@@ -83,12 +83,14 @@ def setup_db():
     local("%s \"%s\"" % (psql, sql))
 
 def setup_scripts():
+  tmpl_name = 'hyclops_jm_template.xml'
   log_dir = '/var/log/hyclops_jm'
   jm_home = "/home/%s/hyclops_jm" % env.js_user
   js_data = "/home/%s/sos-berlin.com/jobscheduler/%s" % (env.js_user, env.js_id)
 
   local("mkdir -p %s" % log_dir)
   local("mkdir -p %s/live" % jm_home)
+  local("cp %s %s/" % (tmpl_name, jm_home))
   local("sed 's/HYCLOPS_JM_USER/%s/g' modules/scripts/fabfile.py > %s/fabfile.py" % (env.js_user, jm_home))
   local("chown -R %s:%s %s" % (env.js_user, env.js_user, log_dir))
   local("chown -R %s:%s %s" % (env.js_user, env.js_user, jm_home))
@@ -118,12 +120,9 @@ def install(user = 'hyclops_jm', passwd = 'hyclops_jm'):
   setup_db()
   setup_scripts()
 
-  print "================================================="
-  print "= Installing HyClops JM is completed!!          = "
-  print "= You go to next step.                          = "
-  print "= - Access the Zabbix web interface.            = "
-  print "=   - example: http://your-domain/zabbix        = "
-  print "= - Create Host name [localhost]                = "
-  print "= - Import Template and attach to localhost     = "
-  print "= - So you can get HyClops JM functions!!       = "
-  print "================================================="
+  print "================================================================"
+  print "= Thank you for installing HyClops JM!!                        ="
+  print "= You can monitor JobScheduler's job using Zabbix from now on. ="
+  print "= Please access the Zabbix web interface and enjoy monitoring. ="
+  print "= - example: http://your-domain/zabbix                         ="
+  print "================================================================"
