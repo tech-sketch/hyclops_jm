@@ -232,6 +232,12 @@ def getzbx_login(id,dbg=0):
 		print res
 
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	auth_data = recvbuf['result']
 
 	return auth_data
@@ -397,6 +403,11 @@ def zbx_getitems(hostid="10084",dbg=0):
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
 
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
 
@@ -430,6 +441,11 @@ def zbx_item_exist(keys,hostid,dbg=0):
 	SoapMessage = SM_TEMPLATE_ITEM_EXIST % (keys,hostid, auth_data, id)
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -466,6 +482,11 @@ def zbx_setitems(name,hostid="10084",dbg=0):
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
 
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
 
@@ -497,6 +518,11 @@ def zbx_delitems(itemid,dbg=0):
 	SoapMessage = SM_TEMPLATE_ITEM_SET % (itemid, auth_data, id)
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -538,6 +564,11 @@ def zbx_gettrigger(hostid="10084",dbg=0):
 		print SoapMessage
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -581,6 +612,11 @@ def zbx_set_trigger(hostid, exp, desp, pri=3, dbg=0):
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
 
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
 
@@ -617,6 +653,11 @@ def zbx_deltrigger(tid,dbg=0):
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
 
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
 
@@ -625,6 +666,41 @@ def zbx_deltrigger(tid,dbg=0):
 
 #============================================================
 
+def zbx_get_hostgroup(group_name, dbg=0):
+	"""
+	zbx_get_hostgroup
+	Zabbixから設定されているホストグループを取得する
+	@param	None		：
+
+	@reruen	id		： Zabbixから取得したhostgroup
+	"""
+
+	getdbinfo(dbg)
+
+	id = env.zbx_id
+
+	SM_TEMPLATE_HOST_GET = """{ "jsonrpc": "2.0", "method": "hostgroup.get", "params": { "output": "extend",
+  "filter": { "name": ["%s"] }
+	}, "auth": "%s", "id": %s }"""
+
+
+	auth_data = getzbx_login(id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (group_name, auth_data, id)
+	res = getzbx( SoapMessage )
+	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
+	if dbg == '1':
+		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
+
+	return recvbuf
+
+#============================================================
 def zbx_gethosts(dbg=0):
 	"""
 	zbx_gethosts
@@ -649,6 +725,11 @@ def zbx_gethosts(dbg=0):
 	SoapMessage = SM_TEMPLATE_HOST_GET % (auth_data, id)
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -681,6 +762,11 @@ def zbx_gethost(hostname,dbg=0):
 	SoapMessage = SM_TEMPLATE_HOST_GET % (hostname, auth_data, id)
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -758,6 +844,11 @@ def gettrigger_enable(tid,dbg=0):
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
 
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
 
@@ -791,6 +882,11 @@ def zbx_trigger_disable(tid, dbg=0):
 	SoapMessage = SM_TEMPLATE_ITEM_GET % (tid, auth_data, id)
 	res = getzbx( SoapMessage )
 	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		print json.dumps(recvbuf, indent=4)			# print All elements of JSON
@@ -846,6 +942,11 @@ def jos_show_history(jobname,tid,dbg=0):
 
 	recvbuf = jos_xml(('<show_history job="%s" id="%d" next="100" />' % (jobname,tid)))
 	root = ET.fromstring(recvbuf)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
 
 	if dbg == '1':
 		xmldoc = minidom.parseString(recvbuf)
@@ -1344,9 +1445,6 @@ def set_job_items(dbg=0):
 	"""
 	set_job_items
 	Zabbixにジョブのitemを設定する
-	@param	None		： 
-
-	@param	None		： 
 	"""
 
 	getdbinfo(dbg)
@@ -1355,10 +1453,15 @@ def set_job_items(dbg=0):
 	set_copy_jobs(dbg)				# 登録情報ファイルに現状ファイルを合わせる
 
 	jos_set_server(dbg)
-	gethosts(dbg)
-
 	set_job_info(dbg=0)
 	set_job_chain_info(dbg=0)
+
+	# setup zabbix host from jobscheduler's process class
+	uniq_hosts = set( val for val in env.process_class.values() )
+	for hostname in uniq_hosts:
+		setup_zbx_host(hostname)
+
+	gethosts(dbg)
 
 	print "===<<< Set Items for Job >>>==="		# Jobのitemの処置
 	for job in env.jos_job:
@@ -1386,10 +1489,7 @@ def set_job_items(dbg=0):
 def set_jobs(dbg=0):
 	"""
 	set_jobs
-	Low Level Discavery用にジョブ情報をJSONで表示する
-	@param	None		： 
-
-	@param	None		： 
+	Low Level DiscaveryのJSONデータをzabbix_senderにてZabbix Serverに送信する
 	"""
 
 	getdbinfo(dbg)
@@ -1414,10 +1514,182 @@ def set_jobs(dbg=0):
 		msg[env.process_class[job]].append(item)
 
 	for k,v in msg.items():
-		cmd ="/usr/bin/zabbix_sender -z %s -s %s -k job.discovery -o \"{\\\"data\\\":%s}\"" % ( env.zbx_server, k, json.dumps(v).replace("\"","\\\""))
-		local(cmd, capture=True, shell=None)
+		err_count = 0
+		while True:
+			try:
+				cmd ="/usr/bin/zabbix_sender -z %s -s %s -k job.discovery -o \"{\\\"data\\\":%s}\"" % ( env.zbx_server, k, json.dumps(v).replace("\"","\\\""))
+				local(cmd, capture=True, shell=None)
+				break
+			except:
+				err_count += 1
+				if err_count > 2:
+					print "[error] Failed to send discovery rule json. Exceed retry timeout in host[%s]" % k
+					break
+				else:
+					print "[warning] Failed to send discovery rule json to host %s. Retry after 60 sec. Retry count: %s/3" % (k, err_count)
+					time.sleep(60)
 
 #============================================================
+
+def setup_zbx_host(hostname, dbg = 0):
+	"""
+	setup_zbx_host
+	引数に与えられた情報を元にZabbixのホストをセットアップする
+	@param	hostname	: process_classに存在するホスト情報
+	"""
+
+	add_zbx_host(hostname, dbg)
+	import_zbx_template(dbg = dbg)
+	attach_zbx_template(hostname)
+
+def add_zbx_host(zbx_hostname, dbg = 0):
+	"""
+	add_zbx_host
+	引数に与えられた情報を元にZabbixのホストを作成する
+  @param	zbx_hostname	: 追加するホスト名
+	"""
+
+	zbx_hostid = gethostid(zbx_hostname, dbg)
+	if zbx_hostid is not None:
+		return
+
+	zbx_hostgroup = zbx_get_hostgroup("Linux servers")
+	hostgroup_id = zbx_hostgroup['result'][0]['groupid']
+
+	SM_TEMPLATE_HOST_GET = """
+{ "jsonrpc": "2.0", "method": "host.create","params": {
+"host": "%s","interfaces": [{"type": 1, "main": 1, "useip": 1, "ip": "127.0.0.1", "dns": "", "port": "10050"}],
+"groups": [{ "groupid": "%s" }]}, "auth": "%s", "id": %s }
+"""
+
+	auth_data = getzbx_login(env.zbx_id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (zbx_hostname, hostgroup_id, auth_data, env.zbx_id)
+	res = getzbx( SoapMessage )
+	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
+	return recvbuf
+
+def import_zbx_template(file_name = 'hyclops_jm_template.xml', dbg = 0):
+	"""
+	add_zbx_host
+	引数に与えられた情報を元にZabbixのtemplateをimportする
+  @param	template_name	: 追加するホスト名
+	"""
+
+	template_path = "%s/%s" % (os.getenv("JM_HOME"), file_name)
+	template_file = open(template_path).read().replace('\n', ' ').replace('"', '\\"')
+
+	SM_TEMPLATE_HOST_GET = """
+{ "jsonrpc": "2.0", "method": "configuration.import","params": {
+"format": "xml","source": "%s", "rules": {
+"groups": {"createMissing": true}, "applications": {"createMissing": true, "updateExisting": true},
+"items": {"createMissing": true, "updateExisting": true},"discoveryRules": {"createMissing": true, "updateExisting": true},
+"templates": {"createMissing": true, "updateExisting": true}, "triggers": {"createMissing": true, "updateExisting": true}
+}},"auth": "%s", "id": %s }
+"""
+
+	auth_data = getzbx_login(env.zbx_id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (template_file, auth_data, env.zbx_id)
+	res = getzbx( SoapMessage )
+	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
+	return recvbuf
+
+
+def attach_zbx_template(zbx_hostname, template_name = 'Template App JobScheduler', dbg = 0):
+	"""
+	attach_zbx_tmplate
+	引数に与えられた情報を元にZabbixのtemplateをimportする
+  @param	zbx_hostname	: 追加するホスト名
+	"""
+
+	SM_TEMPLATE_HOST_GET = """
+{ "jsonrpc": "2.0", "method": "host.get","params": {
+"output": ["hostid"], "selectParentTemplates": "templateid","filter": { "host": "%s" }
+},"auth": "%s", "id": %s }
+"""
+
+	auth_data = getzbx_login(env.zbx_id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (zbx_hostname, auth_data, env.zbx_id)
+	zbx_host = json.loads(getzbx( SoapMessage ))
+	if zbx_host is None:
+		return
+
+	zbx_hostid = zbx_host['result'][0]['hostid']
+	if zbx_hostid is None:
+		return
+
+	zbx_templateid = zbx_template_get(template_name)['result'][0]['templateid']
+	if zbx_templateid is None:
+		return
+
+	templates = zbx_host['result'][0]['parentTemplates']
+
+	missing_hyclops_tmpl = True
+	for val in templates:
+		if val['templateid'] == zbx_templateid:
+			missing_hyclops_tmpl = False
+
+	if missing_hyclops_tmpl:
+		templates.append({'templateid': zbx_templateid})
+
+	SM_TEMPLATE_HOST_GET = """
+{ "jsonrpc": "2.0", "method": "host.update","params": {
+"hostid": "%s", "templates": %s
+},"auth": "%s", "id": %s }
+"""
+
+	auth_data = getzbx_login(env.zbx_id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (zbx_hostid, json.dumps(templates), auth_data, env.zbx_id)
+	res = getzbx( SoapMessage )
+	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
+	return recvbuf
+
+def zbx_template_get(name, dbg = 0):
+	"""
+	zbx_template_get
+	引数に与えられた情報を元にZabbixのtemplateを取得する
+  @param	name	: 取得するtemplate name
+	"""
+
+	SM_TEMPLATE_HOST_GET = """
+{ "jsonrpc": "2.0", "method": "template.get","params": {
+"filter": {"name":["%s"]}
+},"auth": "%s", "id": %s }
+"""
+
+	auth_data = getzbx_login(env.zbx_id)
+
+	SoapMessage = SM_TEMPLATE_HOST_GET % (name, auth_data, env.zbx_id)
+	res = getzbx( SoapMessage )
+	recvbuf = json.loads(res)
+
+	if recvbuf.has_key('error'):
+		print 'Error occurred.'
+		print recvbuf
+		return
+
+	return recvbuf
 
 def trigger_switch(hostid, source_trigger_name, rule, dbg=0):
 	"""
@@ -1590,5 +1862,6 @@ def gethostid(hostname,dbg=0):
 				env.zbx_server_list[results['host']] = results['hostid']
 				if results['name'] == hostname:
 					print results['hostid']
+					return results['hostid']
 
 				i = i + 1
