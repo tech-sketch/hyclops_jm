@@ -943,11 +943,6 @@ def jos_show_history(jobname,tid,dbg=0):
 	recvbuf = jos_xml(('<show_history job="%s" id="%d" next="100" />' % (jobname,tid)))
 	root = ET.fromstring(recvbuf)
 
-	if recvbuf.has_key('error'):
-		print 'Error occurred.'
-		print recvbuf
-		return
-
 	if dbg == '1':
 		xmldoc = minidom.parseString(recvbuf)
 		printAllElement(xmldoc.documentElement)
