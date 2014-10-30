@@ -4,7 +4,6 @@
 """
   HyClop JobMonitoring install script
   Usage : fab -c hyclops_jm.conf install
-    - Default user is scheduler
 """
 
 #############################################################
@@ -30,10 +29,7 @@ def _allow_error():
 def _deny_error():
   env.warn_only = False
 
-#============================================================
-# public functions
-#============================================================
-def add_user(user, passwd):
+def _add_user(user, passwd):
   # Add hyclops jm user
   _allow_error()
   res = run('id %s' % user)
@@ -41,7 +37,7 @@ def add_user(user, passwd):
   if res.return_code != 0:
     local('useradd %s -p"%s"' %(user, passwd))
 
-def sudo_to_user(user):
+def _sudo_to_user(user):
   _allow_error()
   res = run('grep %s /etc/sudoers || grep -r %s /etc/sudoers.d' % (user, user))
   _deny_error()
@@ -50,7 +46,7 @@ def sudo_to_user(user):
     local('echo "Defaults:%s !requiretty,env_reset" >> /etc/sudoers.d/%s' % (user, user))
 
 
-def setup_postfix():
+def _setup_postfix():
   _allow_error()
   res = run('grep hyclops_jm /etc/aliases')
   _deny_error()
@@ -58,7 +54,7 @@ def setup_postfix():
     local('echo "%s: | \\"/usr/local/sbin/hyclops_jm_mail.sh\\"" >> /etc/aliases' % env.jm_user)
     local('newaliases')
 
-def setup_db():
+def _setup_db():
   local("export PATH=/usr/pgsql-%s/bin:$PATH;pip install psycopg2" % env.pgsql_version)
 
   sqls = ["create table sysinfo (name text,value text);",
@@ -82,7 +78,7 @@ def setup_db():
     psql = "psql -U %s -h %s -p %s -d %s -c" % (env.db_user, env.db_host, env.db_port, env.jm_user)
     local("%s \"%s\"" % (psql, sql))
 
-def setup_scripts():
+def _setup_scripts():
   tmpl_name = 'hyclops_jm_template.xml'
   log_dir = '/var/log/hyclops_jm'
   jm_home = "/home/%s/hyclops_jm" % env.js_user
@@ -105,7 +101,7 @@ def setup_scripts():
   for file in files.split('\n'):
     local("sed 's/HYCLOPS_JM_USER/%s/g' modules/%s > %s/config/%s" % (env.js_user, file, js_data, file))
 
-def setup_jobscheduler():
+def _setup_jobscheduler():
   js_data = "/home/%s/sos-berlin.com/jobscheduler/%s" % (env.js_user, env.js_id)
 
   _allow_error()
@@ -115,6 +111,9 @@ def setup_jobscheduler():
     current_mails = run('grep log_mail_to %s/config/factory.ini' % js_data)
     local("sed -i 's/log_mail_to.*=/log_mail_to             = %s@localhost,/g' %s/config/factory.ini" % (env.jm_user, js_data))
 
+#============================================================
+# public functions
+#============================================================
 def install(user = 'hyclops_jm', passwd = 'hyclops_jm'):
   if 'js_user' not in env:
     print 'Usage: fab -c hyclops_jm.conf install'
@@ -123,13 +122,13 @@ def install(user = 'hyclops_jm', passwd = 'hyclops_jm'):
   _deny_error()
   _set_user(user, passwd)
 
-  add_user(user, passwd)
-  add_user(env.js_user, env.js_passwd)
-  sudo_to_user(env.js_user)
-  setup_postfix()
-  setup_jobscheduler()
-  setup_db()
-  setup_scripts()
+  _add_user(user, passwd)
+  _add_user(env.js_user, env.js_passwd)
+  _sudo_to_user(env.js_user)
+  _setup_postfix()
+  _setup_jobscheduler()
+  _setup_db()
+  _setup_scripts()
 
   print "================================================================"
   print "= Thank you for installing HyClops JM!!                        ="
