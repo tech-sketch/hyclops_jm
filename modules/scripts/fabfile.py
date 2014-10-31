@@ -1585,7 +1585,8 @@ def import_zbx_template(file_name = 'hyclops_jm_template.xml', dbg = 0):
 "format": "xml","source": "%s", "rules": {
 "groups": {"createMissing": true}, "applications": {"createMissing": true, "updateExisting": true},
 "items": {"createMissing": true, "updateExisting": true},"discoveryRules": {"createMissing": true, "updateExisting": true},
-"templates": {"createMissing": true, "updateExisting": true}, "triggers": {"createMissing": true, "updateExisting": true}
+"templates": {"createMissing": true, "updateExisting": true}, "triggers": {"createMissing": true, "updateExisting": true},
+"templateLinkage": {"createMissing": true}
 }},"auth": "%s", "id": %s }
 """
 
@@ -1603,10 +1604,10 @@ def import_zbx_template(file_name = 'hyclops_jm_template.xml', dbg = 0):
 	return recvbuf
 
 
-def attach_zbx_template(zbx_hostname, template_name = 'Template App JobScheduler', dbg = 0):
+def attach_zbx_template(zbx_hostname, template_name = 'Template App HyClops JM', dbg = 0):
 	"""
 	attach_zbx_tmplate
-	引数に与えられた情報を元にZabbixのtemplateをimportする
+	引数に与えられた情報を元にZabbixのtemplateをattachする
   @param	zbx_hostname	: 追加するホスト名
 	"""
 
