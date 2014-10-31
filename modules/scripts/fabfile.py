@@ -1709,7 +1709,7 @@ def trigger_switch(hostid, source_trigger_name, rule, dbg=0):
 
 	new_trigger_name = "Switched by HyClops_JobMonitoring(%s)" % source_trigger_name
 	new_ret = zbx_set_trigger(hostid, rule, new_trigger_name, 3, dbg)
-	if new_ret.has_key(u'error'):
+	if new_ret is None:
 		print error
 		return error
 
