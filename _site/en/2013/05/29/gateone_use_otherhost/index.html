@@ -1,0 +1,159 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="author" content="" />
+    <title>Q. Is it possible to use GateOne for hosts in addition to EC2 instance or vSphere VM?</title>
+
+    <link rel="stylesheet" href="/assets/themes/dinky/css/styles.css">
+    <link rel="stylesheet" href="/assets/themes/dinky/css/pygment_trac.css">
+    <link rel="shortcut icon" href="http://192.168.166.162:4001/assets/images/favicon.ico">
+    <script src="/assets/themes/dinky/js/scale.fix.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="/assets/themes/dinky/js/menu.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+      <a href="https://github.com/tech-sketch/hyclops_jm"><img style="position: absolute; top: 0; left: 0; border: 0;padding: 0px; margin: 0px" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+      <h1 class="header"><a href="/"><img src="http://192.168.166.162:4001/assets/images/hyclops_jm_official_logo.png" width=150 height=150 style=border:0px;margin:0px></a></h1>
+        <p class="header"></p>
+        <ul>
+          
+          
+          
+
+
+  
+<li><a href="/index.html#about">About</a></li>
+
+<li><a href="/index.html#architecture">Architecture</a></li>
+
+<li><a href="/index.html#install">Install</a></li>
+
+<li><a href="/index.html#usage">Usage</a></li>
+
+<li><a href="/download.html">Download</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">Roadmap</a></li>
+
+<li><a href="/index.html#contact">Contact</a></li>
+
+<li><a href="/index.html#license">License</a></li>
+
+
+<a href=http://192.168.166.162:4001><img src=http://192.168.166.162:4001/assets/images/flag_united_kingdom.png width=30 height=30 title=English style="border:0px;margin:0px"></a>
+<a href=http://192.168.166.162:4001/jp><img src=http://192.168.166.162:4001/assets/images/flag_japan.png width=30 height=30 title=Japanese style="border:0px;margin:0px"></a>
+<br><a href=http://www.tis.co.jp><img src=http://192.168.166.162:4001/assets/images/TIS_logo-trans.png width=66 height=27 title=TIS style="border:0px;margin:0px"></a>
+
+
+
+
+
+        </ul>
+        
+        
+      </header>
+
+      <section>
+      
+
+<section>
+  <h1>Q. Is it possible to use GateOne for hosts in addition to EC2 instance or vSphere VM?</h1>
+
+  <h2 id="answer">Answer</h2>
+
+<p>It is possible to use Zabbix map and map icon url.
+The process is following.</p>
+
+<h3 id="create-map">1: Create Map</h3>
+
+<ul>
+  <li>Create map to be displayed the connection target host on this map.
+    <ul>
+      <li>At Zabbix management Web page (Configuration-&gt;Maps-&gt;Create map)</li>
+      <li></li>
+    </ul>
+  </li>
+  <li>Set host type icon or hostgroup type icon on this created map.</li>
+</ul>
+
+<h3 id="set-gateone-url-to-target-map-icon">2: Set GateOne URL to target map icon</h3>
+
+<ul>
+  <li>Set GateOne access URL to map icons.
+    <ul>
+      <li>URL is GateOne page URL(gateone.php).</li>
+      <li>gateone.php can receive zabbix host ID GET parameter.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>e.g.) http://zabbix-server-hostname/zabbix/gateone.php?hostid={HOST.ID}<br />
+(You can set Zabbix Macro at map icon url)</p>
+
+<h3 id="connect-to-ssh-console-with-gateone">3: Connect to SSH console with GateOne</h3>
+
+<ul>
+  <li>Click target host at the map view page.</li>
+  <li>Click GateOne URL link in displayed menu.</li>
+</ul>
+
+
+
+  
+</section>
+
+<a href="http://192.168.166.162:4001/faq.html">Back to FAQ list</a>
+
+
+      </section>
+
+      <footer>
+      <p><small>Hosted on <a href="http://pages.github.com/">GitHub Pages</a> with <a href="https://github.com/sodabrew/theme-dinky">Dinky theme</a> for <a href="http://jekyllbootstrap.com/">Jekyll Bootstrap</a> / HyClops JM Logo created by Eiko Kubo worked at TIS inc.</small></p>
+      <ul class=responsive_menu>
+          <li><span class=menu_icon>menu</span>
+            <ul class=menu_list>
+            
+            
+            
+<li><a href="/index.html#about">About</a></li>
+
+<li><a href="/index.html#architecture">Architecture</a></li>
+
+<li><a href="/index.html#install">Install</a></li>
+
+<li><a href="/index.html#usage">Usage</a></li>
+
+<li><a href="/download.html">Download</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">Roadmap</a></li>
+
+<li><a href="/index.html#contact">Contact</a></li>
+
+<li><a href="/index.html#license">License</a></li>
+
+
+            </ul>
+          </li>
+      </ul>
+      </footer>
+      <footer class=tis_footer>
+      <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/termsofuse/index.html>About this site</a>  <br>
+      <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.com/securitypolicy/index.html>Group Information Security Policy</a>  <br>
+      <span class=partition> | </span><span class=copyright>Copyright 2014 TIS Inc.</span><span class=partition> | </span>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
+

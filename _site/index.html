@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="author" content="" />
+    <title>HyClops JobMonitoring</title>
+
+    <link rel="stylesheet" href="/assets/themes/dinky/css/styles.css">
+    <link rel="stylesheet" href="/assets/themes/dinky/css/pygment_trac.css">
+    <link rel="shortcut icon" href="http://192.168.166.162:4001/assets/images/favicon.ico">
+    <script src="/assets/themes/dinky/js/scale.fix.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="/assets/themes/dinky/js/menu.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+      <a href="https://github.com/tech-sketch/hyclops_jm"><img style="position: absolute; top: 0; left: 0; border: 0;padding: 0px; margin: 0px" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+      <h1 class="header"><a href="/"><img src="http://192.168.166.162:4001/assets/images/hyclops_jm_official_logo.png" width=150 height=150 style=border:0px;margin:0px></a></h1>
+        <p class="header"></p>
+        <ul>
+          
+          
+          
+
+
+  
+<li><a href="/index.html#about">About</a></li>
+
+<li><a href="/index.html#architecture">Architecture</a></li>
+
+<li><a href="/index.html#install">Install</a></li>
+
+<li><a href="/index.html#usage">Usage</a></li>
+
+<li><a href="/download.html">Download</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">Roadmap</a></li>
+
+<li><a href="/index.html#contact">Contact</a></li>
+
+<li><a href="/index.html#license">License</a></li>
+
+
+<a href=http://192.168.166.162:4001><img src=http://192.168.166.162:4001/assets/images/flag_united_kingdom.png width=30 height=30 title=English style="border:0px;margin:0px"></a>
+<a href=http://192.168.166.162:4001/jp><img src=http://192.168.166.162:4001/assets/images/flag_japan.png width=30 height=30 title=Japanese style="border:0px;margin:0px"></a>
+<br><a href=http://www.tis.co.jp><img src=http://192.168.166.162:4001/assets/images/TIS_logo-trans.png width=66 height=27 title=TIS style="border:0px;margin:0px"></a>
+
+
+
+
+
+        </ul>
+        
+        
+      </header>
+
+      <section>
+      
+
+<section>
+  <h1>HyClops JobMonitoring</h1>
+
+  
+<h1 id="about">About</h1>
+
+<p>HyClops JobMonitoring is the tool for system operators that is collaborating monitoring tool “Zabbix” and job management tool “JobScheduler”.
+If you use this tool, you can monitor JobScheduler’s job on Zabbix.</p>
+
+<p><em>Note:</em>
+<em>The series of HyClops exists <a href="http://tech-sketch.github.io/hyclops/">HyClops for Zabbix</a>. This realized integrated management for Hybrid Cloud environments on Zabbix</em></p>
+
+<p>As second steps, we focused on the job management feature that is insufficient on Zabbix.
+JobScheduler has many advanced job management features, so we focused on JobScheduler and realized the collaboration with Zabbix and JobScheduler.
+If you use HyClops JobMonitoring, you will benefit from reduction of cumbersome system operations.</p>
+
+<p>We don’t customize of Zabbix and JobScheduler, but we exploit these APIs.
+This is one of the characteristic of JobMonitoring.</p>
+
+<p>HyClops JobMonitoring provides following features:</p>
+
+<ul>
+  <li>Automatically register Zabbix items for job monitoring.</li>
+  <li>Monitor the job elapse and analyze the job elapse transition.</li>
+  <li>Collaborate job error/delay information to Zabbix, and you can do the action based on Zabbix.</li>
+  <li>Automatically change the Zabbix trigger threashold settings adapt to the job execution.</li>
+</ul>
+
+<h1 id="releases">Release Notes</h1>
+
+<ul>
+  <li>2014/12/xx ver.0.1.0
+    <ul>
+      <li>Initial release</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="architecture">Architecture</h1>
+
+<p><img src="http://192.168.166.162:4001/assets/images/HyClopsJM_architecture.png" alt="architecture" /></p>
+
+<p>HyClops JobMonitoring controls Zabbix and JobScheduler through APIs. And these are configured by Fabric scripts.
+JobMonitoring uses database for Zabbix and JobScheduler APIs.
+It has IP addresses, port numbers, authenticated information.</p>
+
+<h1 id="features-detail">Features detail</h1>
+
+<h2 id="monitor-the-job-elapse-time">Monitor the job elapse time</h2>
+
+<p><img src="http://192.168.166.162:4001/assets/images/job_elapse_detail.png" alt="architecture" /></p>
+
+<p>JobMonitoring automatically registers the Zabbix host and item for job monitoring based on JobScheduler’s job definitions.
+After that, The job elapse is registered regularly in these items by JobMonitoring.
+JobMonitoring registers automatically following Zabbix information.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Auto register information in Zabbix</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Template</td>
+      <td>“Template App JobScheduler” and “Template App HyClops JM” is registered.</td>
+    </tr>
+    <tr>
+      <td>Host</td>
+      <td>JobMonitoring sets the Zabbix host base on JobScheduler’s process_class definition. If process_class don’t be defined, JobMonitoring register the Zabbix host named “localhost”.</td>
+    </tr>
+    <tr>
+      <td>Item</td>
+      <td>JobMonitoring registers Zabbix items for job monitoring base on JobScheduler’s job.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="collaborate-job-errordelay-information-to-zabbix">Collaborate job error/delay information to Zabbix</h2>
+
+<p>If the job error occurred, JobMonitoring hooks mail send by JobScheduler and collaborates error flag to Zabbix.
+From this, you can use Zabbix trigger and actions.</p>
+
+<h2 id="automatically-change-the-zabbix-trigger-threashold">Automatically change the Zabbix trigger threashold</h2>
+
+<p><img src="http://192.168.166.162:4001/assets/images/error_collaboration_detail.png" alt="architecture" /></p>
+
+<p>JobMonitoring provides changing the trigger job template.
+If you use this template, you can change the trigger threashold only executing the specified job.
+The sample job template configures the job chain that the main job always execute if before process is failed.</p>
+
+<h1 id="install">Install</h1>
+
+<h2 id="requirements">Requirements</h2>
+
+<p>Available OS</p>
+
+<ul>
+  <li>CentOS 6(Verification: 6.5)</li>
+</ul>
+
+<p>To take advantage of HyClops JobMonitoring you need to install the following middlewares to one instance.</p>
+
+<ul>
+  <li>Zabbix (2.2 or later) (Verification: 2.2.7, 2.4.2)</li>
+  <li>Python (2.6) (Verification: 2.6.6)</li>
+  <li>Fabric (1.10 or later) (Verification: 1.10.0)</li>
+  <li>PostgreSQL (9.3 or later) (Verification: 9.3.5)</li>
+  <li>JobScheduler (1.7 or later) (Verification: 1.7.4274)</li>
+</ul>
+
+<p>If you use <a href="https://github.com/tech-sketch/hyclops_jm-chef-repo">these scripts</a>, you can install automatically above middlewares.</p>
+
+<p>If you install manually, you should see following pages.</p>
+
+<ul>
+  <li><a href="https://www.zabbix.com/documentation/2.2/manual/installation/install_from_packages">Zabbix2.2 install manual</a></li>
+  <li><a href="http://www.fabfile.org/installing.html">Fabric install manual</a></li>
+  <li><a href="http://www.postgresql.org/download/linux/redhat/">PostgreSQL install manual</a></li>
+  <li><a href="http://www.sos-berlin.com/doc/en/scheduler_installation.pdf">JobScheduler install manual</a></li>
+</ul>
+
+<h2 id="install-hyclops-jobmonitoring">Install HyClops JobMonitoring</h2>
+
+<p>you need to be a root user to do following procedure.</p>
+
+<p>Download HyClops JobMonitoring modules from Github.</p>
+
+<pre><code>Stable version.
+# curl -O https://github.com/tech-sketch/hyclops_jm/archive/[version no.].tar.gz
+# tar zxvf hyclops_jm-[version no.].tar.gz
+Latest version.
+# git clone https://github.com/tech-sketch/hyclops_jm.git
+</code></pre>
+
+<p>Move the package directory and modify the setting file.</p>
+
+<pre><code># cd hyclops_jm
+# vi hyclops_jm.conf
+</code></pre>
+
+<p>you need to make following settings to adapt your environment.</p>
+
+<pre><code># HyClops JobMonitoring user
+jm_user = hyclops_jm    # HyClops JobMonitoring OS user
+jm_passwd = hyclops_jm  # above user's password
+
+# JobScheduler configuration
+js_id = scheduler       # JobScheduler's scheduler id
+js_user = scheduler     # JobScheduler installed user
+js_passwd = scheduler   # above user's password
+js_host = 127.0.0.1     # JobScheduler run ip address
+js_port = 4444          # JobScheduler listen port
+
+# Zabbix configuration
+zbx_host = 127.0.0.1    # Zabbix run ip address
+zbx_login_user = Admin  # Zabbix Admin user name
+zbx_login_passwd = zabbix   # above user's password
+zbx_external_scripts_dir = /usr/lib/zabbix/externalscripts  # Zabbix external script directory
+
+# Database super user
+db_user = postgres    # PostgreSQL super user
+db_passwd =           # above user's password
+db_host = 127.0.0.1   # PostgreSQL run ip address
+db_port = 5432        # PostgreSQL listen port
+pgsql_version = 9.3   # PostgreSQL version
+</code></pre>
+
+<p>Run Fabric install script.</p>
+
+<p><em>Note: Before running fabric, you need to setting that root user login to 127.0.0.1 by ssh.</em></p>
+
+<pre><code># fab -c hyclops_jm.conf install
+</code></pre>
+
+<p>After that, it will be created the HyClops JobMonitoring DB and distributed the related scripts in specify directories.</p>
+
+<h1 id="usage">Usage</h1>
+
+<h2 id="monitor-the-job-elapse-time-1">Monitor the job elapse time</h2>
+
+<p>There is no need for setting. After a constant of time from installation, JobMonitoring registers the job monitoring items and begin monitoring by Zabbix.
+If you add the job in JobScheduler, JobMonitoring register the new monitoring items automatically.</p>
+
+<p><img src="http://192.168.166.162:4001/assets/images/zabbix_host.png" alt="host" /></p>
+
+<p><img src="http://192.168.166.162:4001/assets/images/zabbix_items.png" alt="items" /></p>
+
+<h2 id="collaborate-job-errordelay-information-to-zabbix-1">Collaborate job error/delay information to Zabbix</h2>
+
+<p>In case of job error/delay, JobMonitoring register “1” to below item.</p>
+
+<ul>
+  <li>jos_server_status</li>
+</ul>
+
+<p>Setting the Zabbix trigger to above item, you can monitoring job error/delay status.</p>
+
+<p><em>Note: Point in initial release JobMonitoring register only “localhost” Zabbix host above status because of <a href="https://github.com/tech-sketch/hyclops_jm/issues/4">issue#4</a></em></p>
+
+<p><img src="http://192.168.166.162:4001/assets/images/zabbix_latest_data.png" alt="latest_data" /></p>
+
+<h2 id="automatically-change-the-zabbix-trigger-threashold-1">Automatically change the Zabbix trigger threashold</h2>
+
+<p>After installing HyClops JobMonitoring, you will find the job chain named HyClops_JM_Trigger_Switch_Template in JobScheduler’s hyclops_jm directory.
+This job chain is change the trigger threashold template.</p>
+
+<p><img src="http://192.168.166.162:4001/assets/images/jobscheduler_template_jobchain.png" alt="template_jobchain" /></p>
+
+<p>We will assume the following scenario.
+In general case monitoring memory usage threashold on serverA is 20MB, but when running jobA memory usage threashold change 50MB.</p>
+
+<p><img src="http://192.168.166.162:4001/assets/images/sample_jobchain.png" alt="architecture" /></p>
+
+<p>In this case you should be the setting of the job chain to run a trigger change tempalte job before and after jobA is running with the following procedure.</p>
+
+<h3 id="copy-the-job-tempalate">Copy the job tempalate</h3>
+
+<p>Copy the following jobs in hyclops_jm directory to serverA directory.</p>
+
+<ul>
+  <li>HyClops_JM_Trigger_switch.job.xml</li>
+  <li>HyClops_JM_Trigger_ret.job.xml</li>
+  <li>target_zabbix_host.xml</li>
+</ul>
+
+<h3 id="create-the-job-chain">Create the job chain</h3>
+
+<p>Configure the job chain so as to be in the order following execution.</p>
+
+<pre>
+(1)HyClops_JM_Trigger_switch =&gt; (2)jobA =&gt; (3)HyClops_JM_Trigger_ret
+</pre>
+
+<h3 id="configure-the-zabbix-host">Configure the Zabbix host</h3>
+
+<p>Configure the Zabbix host named in target_zabbix_host.xml.</p>
+
+<pre>
+&lt;params&gt;
+  &lt;!-- Configure the Zabbix host in value parameter. --&gt;
+  &lt;param name="zabbix_host" value="localhost"/&gt;
+&lt;/params&gt;
+</pre>
+
+<h3 id="configure-the-before-and-after-trigger-threashold">Configure the before and after trigger threashold</h3>
+
+<p>Configure the parameter in HyClops_JM_Trigger_switch.job.xml</p>
+
+<pre>
+&lt;params&gt;
+  &lt;include live_file="target_zabbix_host.xml" node=""/&gt;
+  &lt;!-- Specify the target of change trigger name. you select the trigger name from Zabbix Web UI. --&gt;
+  &lt;param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/&gt;
+  &lt;!-- Specify the enable of changed trigger conditional expression. --&gt;
+  &lt;param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/&gt;
+&lt;/params&gt;
+</pre>
+
+<p>In these configuration, you can use the automatically change the Zabbix trigger threashold.
+Before run jobA the trigger change job run and change the memory threashold 20MB to 50MB.
+After run jobA the trigger return job run and change the memory threashold 20MB.</p>
+
+<h1 id="contact">Contact</h1>
+
+<p>Please send feedback to us.</p>
+
+<p><a href="http://www.tis.co.jp">TIS Inc.</a><br />
+Strategic Technology Center</p>
+
+<p>HyClops JobMonitoring Team<br />
+<a href="&#109;&#097;&#105;&#108;&#116;&#111;:&#104;&#121;&#099;&#108;&#111;&#112;&#115;&#064;&#109;&#108;&#046;&#116;&#105;&#115;&#046;&#099;&#111;&#046;&#106;&#112;">&#104;&#121;&#099;&#108;&#111;&#112;&#115;&#064;&#109;&#108;&#046;&#116;&#105;&#115;&#046;&#099;&#111;&#046;&#106;&#112;</a></p>
+
+<h1 id="license">License</h1>
+
+<p>HyClops JobMonitoring is released under the Apache License, Version 2.0.
+The Apache v2 full text is published at thie <a href="http://www.apache.org/licenses/LICENSE-2.0">link</a>.</p>
+
+
+
+  
+</section>
+
+
+      </section>
+
+      <footer>
+      <p><small>Hosted on <a href="http://pages.github.com/">GitHub Pages</a> with <a href="https://github.com/sodabrew/theme-dinky">Dinky theme</a> for <a href="http://jekyllbootstrap.com/">Jekyll Bootstrap</a> / HyClops JM Logo created by Eiko Kubo worked at TIS inc.</small></p>
+      <ul class=responsive_menu>
+          <li><span class=menu_icon>menu</span>
+            <ul class=menu_list>
+            
+            
+            
+<li><a href="/index.html#about">About</a></li>
+
+<li><a href="/index.html#architecture">Architecture</a></li>
+
+<li><a href="/index.html#install">Install</a></li>
+
+<li><a href="/index.html#usage">Usage</a></li>
+
+<li><a href="/download.html">Download</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">Roadmap</a></li>
+
+<li><a href="/index.html#contact">Contact</a></li>
+
+<li><a href="/index.html#license">License</a></li>
+
+
+            </ul>
+          </li>
+      </ul>
+      </footer>
+      <footer class=tis_footer>
+      <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/termsofuse/index.html>About this site</a>  <br>
+      <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.com/securitypolicy/index.html>Group Information Security Policy</a>  <br>
+      <span class=partition> | </span><span class=copyright>Copyright 2014 TIS Inc.</span><span class=partition> | </span>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
+
