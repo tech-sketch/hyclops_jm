@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="author" content="" />
+    <title>Q. GateOneに接続できません原因として何が考えられますか？</title>
+
+    <link rel="stylesheet" href="/assets/themes/dinky/css/styles.css">
+    <link rel="stylesheet" href="/assets/themes/dinky/css/pygment_trac.css">
+    <link rel="shortcut icon" href="http://192.168.166.162:4001/assets/images/favicon.ico">
+    <script src="/assets/themes/dinky/js/scale.fix.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="/assets/themes/dinky/js/menu.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+      <a href="https://github.com/tech-sketch/hyclops"><img style="position: absolute; top: 0; left: 0; border: 0;padding: 0px; margin: 0px" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+      <h1 class="header"><a href="http://192.168.166.162:4001"><img src="http://192.168.166.162:4001/assets/images/hyclops_jm_official_logo.png" width=150 height=150 style=border:0px;margin:0px></a></h1>
+        <p class="header"></p>
+        <ul>
+          
+          
+          
+
+
+  
+<li><a href="/jp/index.html#about">概要</a></li>
+
+<li><a href="/jp/index.html#architecture">アーキテクチャ</a></li>
+
+<li><a href="/jp/index.html#install">インストール</a></li>
+
+<li><a href="/jp/index.html#usage">利用方法</a></li>
+
+<li><a href="/jp/download.html">ダウンロード</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">ロードマップ</a></li>
+
+<li><a href="/jp/index.html#contact">問い合わせ先</a></li>
+
+<li><a href="/jp/index.html#license">ライセンス</a></li>
+
+
+<a href=http://192.168.166.162:4001><img src=http://192.168.166.162:4001/assets/images/flag_united_kingdom.png width=30 height=30 title=English style="border:0px;margin:0px"></a>
+<a href=http://192.168.166.162:4001/jp><img src=http://192.168.166.162:4001/assets/images/flag_japan.png width=30 height=30 title=Japanese style="border:0px;margin:0px"></a>
+<br><a href=http://www.tis.co.jp><img src=http://192.168.166.162:4001/assets/images/TIS_logo-trans.png width=66 height=27 title=TIS style="border:0px;margin:0px"></a>
+
+
+
+
+
+        </ul>
+        
+        
+      </header>
+
+      <section>
+      
+
+<section>
+  <h1>Q. GateOneに接続できません原因として何が考えられますか？</h1>
+
+  <h2 id="section">回答</h2>
+
+<p>以下の原因が考えられます。
+状況を確認し対応して下さい。  </p>
+
+<ul>
+<li> セキュリティ証明書の問題</li>
+<li> 接続元サーバ(Zabbix Server)とGateOneサーバの時刻ズレの問題</li>
+<li> APIキー設定の問題</li>
+<li> 接続元許可設定の問題</li>
+</ul>
+
+<h3 id="section-1">セキュリティ証明書の問題</h3>
+
+<p>セキュリティ証明書が信頼できない場合、ZabbixダッシュボードからSSH接続を実行しても画面に何も表示されません。
+GateOneサーバに信頼できるセキュリティ証明書を登録するか、例外として事前に登録しておく必要があります。</p>
+
+<h3 id="zabbix-servergateone">接続元サーバ(Zabbix Server)とGateOneサーバの時刻ズレの問題</h3>
+
+<p>GateOneでは認証用トークン生成及び認証チェックに時刻情報を利用しています。
+そのため、認証用トークンを生成する接続元(Zabbix Server)の時刻とチェックを実行するGateOneサーバで時刻がずれている場合に不正なトークンであるとみなされ接続が拒否されます。</p>
+
+<p>この時、GateOneのログ(/opt/gateone/logs/webserver.log)に以下の内容が書きこまれます。</p>
+
+<pre><code>API authentication failed due to an expired auth object.
+If you just restarted the server this is normal (users just need to reload the page).
+If  this problem persists it could be a problem with the server's clock (either this server or the server(s) embedding Gate One).
+</code></pre>
+
+<p>接続元とGateOneサーバの時刻を正しく設定して下さい。</p>
+
+<h3 id="api">APIキー設定の問題</h3>
+
+<p>/opt/gateone/server.confのapi_keys設定に書かれているAPIキー及びシークレットキーが正しくZabbixのマクロに設定されているかを確認して下さい。
+Zabbix側では次の2つのグローバルマクロで設定を行います。<br />
+{$GATEONE_KEY},{$GATEONE_SECRET}</p>
+
+<p>APIキーの設定が誤っている場合、GateOneのログに以下の内容が書きこまれます。</p>
+
+<pre><code>Error running plugin WebSocket action: ssh_get_connect_string
+</code></pre>
+
+<p>APIキーの設定を見なおして下さい。</p>
+
+<h3 id="section-2">接続元許可設定の問題</h3>
+
+<p>GateOneは接続元の許可設定を行う機能があります。
+接続元許可設定は、/opt/gateone/server.confのoriginsで設定します。
+Zabbixサーバからの接続許可設定が正しく行われているか確認して下さい。</p>
+
+<p>接続元許可設定が正しく実施されていない場合、GateOneのログに以下の内容が書きこまれます。</p>
+
+<pre><code>Access denied for origin: http://zabbix-server-hostname
+</code></pre>
+
+<p>上記エラー発生の場合には、server.confに以下の設定を実施します。</p>
+
+<pre><code>origins = "http://zabbix-server-hostname"
+</code></pre>
+
+<p>設定変更後、GateOneを再起動して下さい。</p>
+
+
+
+  
+</section>
+
+<a href="http://192.168.166.162:4001/jp/faq.html">FAQ一覧へ戻る</a>
+
+
+      </section>
+
+      <footer>
+      <p><small>Hosted on <a href="http://pages.github.com/">GitHub Pages</a> with <a href="https://github.com/sodabrew/theme-dinky">Dinky theme</a> for <a href="http://jekyllbootstrap.com/">Jekyll Bootstrap</a> / HyClops JM Logo created by Eiko Kubo worked at TIS inc.</small></p>
+      <ul class=responsive_menu>
+          <li><span class=menu_icon>メニュー</span>
+            <ul class=menu_list>
+            
+            
+            
+<li><a href="/jp/index.html#about">概要</a></li>
+
+<li><a href="/jp/index.html#architecture">アーキテクチャ</a></li>
+
+<li><a href="/jp/index.html#install">インストール</a></li>
+
+<li><a href="/jp/index.html#usage">利用方法</a></li>
+
+<li><a href="/jp/download.html">ダウンロード</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">ロードマップ</a></li>
+
+<li><a href="/jp/index.html#contact">問い合わせ先</a></li>
+
+<li><a href="/jp/index.html#license">ライセンス</a></li>
+
+
+            </ul>
+          </li>
+      </ul>
+      </footer>
+      <footer class=tis_footer>
+        <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/termsofuse/index.html>サイトのご利用について</a>  <br>
+        <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/securitypolicy/index.html>情報セキュリティ方針</a>  <br>
+        <span class=partition> | </span><span class=copyright>Copyright 2014 TIS Inc.</span><span class=partition> | </span>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
+

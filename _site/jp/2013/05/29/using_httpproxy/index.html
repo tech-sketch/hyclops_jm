@@ -1,0 +1,182 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="author" content="" />
+    <title>Q. HTTPプロキシ経由でAWS APIにアクセスすることは可能ですか？</title>
+
+    <link rel="stylesheet" href="/assets/themes/dinky/css/styles.css">
+    <link rel="stylesheet" href="/assets/themes/dinky/css/pygment_trac.css">
+    <link rel="shortcut icon" href="http://192.168.166.162:4001/assets/images/favicon.ico">
+    <script src="/assets/themes/dinky/js/scale.fix.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="/assets/themes/dinky/js/menu.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+      <a href="https://github.com/tech-sketch/hyclops"><img style="position: absolute; top: 0; left: 0; border: 0;padding: 0px; margin: 0px" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+      <h1 class="header"><a href="http://192.168.166.162:4001"><img src="http://192.168.166.162:4001/assets/images/hyclops_jm_official_logo.png" width=150 height=150 style=border:0px;margin:0px></a></h1>
+        <p class="header"></p>
+        <ul>
+          
+          
+          
+
+
+  
+<li><a href="/jp/index.html#about">概要</a></li>
+
+<li><a href="/jp/index.html#architecture">アーキテクチャ</a></li>
+
+<li><a href="/jp/index.html#install">インストール</a></li>
+
+<li><a href="/jp/index.html#usage">利用方法</a></li>
+
+<li><a href="/jp/download.html">ダウンロード</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">ロードマップ</a></li>
+
+<li><a href="/jp/index.html#contact">問い合わせ先</a></li>
+
+<li><a href="/jp/index.html#license">ライセンス</a></li>
+
+
+<a href=http://192.168.166.162:4001><img src=http://192.168.166.162:4001/assets/images/flag_united_kingdom.png width=30 height=30 title=English style="border:0px;margin:0px"></a>
+<a href=http://192.168.166.162:4001/jp><img src=http://192.168.166.162:4001/assets/images/flag_japan.png width=30 height=30 title=Japanese style="border:0px;margin:0px"></a>
+<br><a href=http://www.tis.co.jp><img src=http://192.168.166.162:4001/assets/images/TIS_logo-trans.png width=66 height=27 title=TIS style="border:0px;margin:0px"></a>
+
+
+
+
+
+        </ul>
+        
+        
+      </header>
+
+      <section>
+      
+
+<section>
+  <h1>Q. HTTPプロキシ経由でAWS APIにアクセスすることは可能ですか？</h1>
+
+  <h2 id="section">回答</h2>
+
+<p>以下の設定を行うことにより対応可能です。</p>
+
+<h3 id="hyclopsconf">1: 環境変数またはhyclops.confにプロキシ設定を行う</h3>
+
+<p>環境変数またはhyclops.confのenvironmentsにプロキシ情報を設定します。</p>
+
+<ul>
+  <li>http_proxy : http通信に利用するプロキシ設定</li>
+  <li>https_proxy : https通信に利用するプロキシ設定</li>
+  <li>no_proxy : プロキシ経由で通信しないネットワークアドレス設定</li>
+</ul>
+
+<p>hyclops.confに設定する場合は以下のように設定します。</p>
+
+<pre><code>[environments]
+http_proxy = http://username:password@proxy.example.com:8080
+https_proxy = http://username:password@proxy.example.com:8080
+no_proxy = "localhost,127.0.0.1,10.1.1.*"
+</code></pre>
+
+<h3 id="libcloud">2: libcloudにプロキシ設定読み込み処理を追記</h3>
+
+<p>設定を書き込むファイルは”apache-libcloud”Pythonパッケージのlibcloud/common/base.pyです。</p>
+
+<pre><code>import os    # 追加
+import base64   # 追加
+def connect
+...略
+### ここから
+    proxy_env = "https_proxy" if port == 443 else "http_proxy"
+    proxy_url = os.environ.get(proxy_env)
+    if proxy_url:
+        proxy = urlparse.urlparse(proxy_url)
+        if proxy.hostname and proxy.port:
+            if port == 443:
+                connection = self.conn_classes[secure](proxy.hostname, proxy.port)
+                if proxy.username and proxy.password:
+                    headers = kwargs.get('headers', []) 
+                    headers = {"Proxy-Authorization":"Basic " + base64.b64encode(proxy.username + ":" + proxy.password)}
+                    kwargs["headers"] = headers
+                connection.set_tunnel(**kwargs)
+            else:
+                connection = self.conn_classes[False](proxy.hostname, proxy.port)
+### ここまで
+    self.connetion = connection
+</code></pre>
+
+<h3 id="section-1">注意</h3>
+
+<p>Python2.6系を利用している場合、認証有りプロキシが利用できません。
+認証無しのプロキシを利用する場合は、以下の設定で対応できます。</p>
+
+<p>設定するファイルは”apache-libcloud”Pythonパッケージのlibcloud/common/base.pyです。</p>
+
+<pre><code>def connect
+...略
+    connection = self.conn_classes[False]("proxy hostname", proxy port number)   # &lt;=proxy設定を引数に追加
+</code></pre>
+
+
+
+  
+</section>
+
+<a href="http://192.168.166.162:4001/jp/faq.html">FAQ一覧へ戻る</a>
+
+
+      </section>
+
+      <footer>
+      <p><small>Hosted on <a href="http://pages.github.com/">GitHub Pages</a> with <a href="https://github.com/sodabrew/theme-dinky">Dinky theme</a> for <a href="http://jekyllbootstrap.com/">Jekyll Bootstrap</a> / HyClops JM Logo created by Eiko Kubo worked at TIS inc.</small></p>
+      <ul class=responsive_menu>
+          <li><span class=menu_icon>メニュー</span>
+            <ul class=menu_list>
+            
+            
+            
+<li><a href="/jp/index.html#about">概要</a></li>
+
+<li><a href="/jp/index.html#architecture">アーキテクチャ</a></li>
+
+<li><a href="/jp/index.html#install">インストール</a></li>
+
+<li><a href="/jp/index.html#usage">利用方法</a></li>
+
+<li><a href="/jp/download.html">ダウンロード</a></li>
+
+<li><a href="https://github.com/tech-sketch/hyclops_jm/milestones">ロードマップ</a></li>
+
+<li><a href="/jp/index.html#contact">問い合わせ先</a></li>
+
+<li><a href="/jp/index.html#license">ライセンス</a></li>
+
+
+            </ul>
+          </li>
+      </ul>
+      </footer>
+      <footer class=tis_footer>
+        <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/termsofuse/index.html>サイトのご利用について</a>  <br>
+        <span class=list>- </span><span class=partition> | </span><a href=http://www.tis.co.jp/securitypolicy/index.html>情報セキュリティ方針</a>  <br>
+        <span class=partition> | </span><span class=copyright>Copyright 2014 TIS Inc.</span><span class=partition> | </span>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
+
