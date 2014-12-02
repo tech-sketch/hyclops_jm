@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Jekyll-Bootstrap
 
 The quickest way to start and publish your Jekyll powered blog. 100% compatible with GitHub pages
@@ -58,4 +57,3 @@ You can see the details of HyClops JobMonitoring on [tech-sketch.github.io/hyclo
 
 Copyright 2014 TIS Inc. HyClops for Zabbix Team (hyclops@ml.tis.co.jp)
 Licensed under the Apache License, Version 2.0. The Apache v2 full text is published at [this link](http://www.apache.org/licenses/LICENSE-2.0).
->>>>>>> 7ea0029b9fc4baf5f248fac5ef6ef07c457466ad
