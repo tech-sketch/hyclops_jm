@@ -20,7 +20,7 @@ HyClops JobMonitoringの機能概要:
 
 # リリースノート {#releases}
 
-* 2014/12/xx ver.0.1.0
+* 2014/12/10 ver.0.1.0
   * 初期リリース
  
 # アーキテクチャ {#architecture}
