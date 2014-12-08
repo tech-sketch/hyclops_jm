@@ -1,28 +1,32 @@
 # About {#about}
 
-HyClops JobMonitoring is the tool for system operators that is collaborating monitoring tool "Zabbix" and job management tool "JobScheduler".
-If you use this tool, you can monitor JobScheduler's job on Zabbix.
+HyClops JobMonitoring is the tool for system operators that is collaborating “Zabbix”(monitoring tool) and “JobScheduler”(job management tool).
+This tool integrates monitoring of JobScheduler's job information on Zabbix. 
 
-*Note:*
-*The series of HyClops exists [HyClops for Zabbix](http://tech-sketch.github.io/hyclops/). This realized integrated management for Hybrid Cloud environments on Zabbix*
+We have already released "HyClops for Zabbix" as OSS.
+This tool is for monitoring Hybrid Cloud environments on Zabbix.
 
-As second steps, we focused on the job management feature that is insufficient on Zabbix.
-JobScheduler has many advanced job management features, so we focused on JobScheduler and realized the collaboration with Zabbix and JobScheduler.
-If you use HyClops JobMonitoring, you will benefit from reduction of cumbersome system operations.
+As next step, we focused on the "job management" feature that is insufficient on Zabbix.
+JobScheduler has many advanced job management features.
+But it doesn't have job monitoring features enough.
+So, we developed the collaboration tool of Zabbix and JobScheduler.
 
-We don't customize of Zabbix and JobScheduler, but we exploit these APIs.
-This is one of the characteristic of JobMonitoring.
+This tool will lead to the reduction for the cumbersome system operations.
+
+The collaborations of each tools are implemented by API base.
+So, all original features of Zabbix and JobScheduler are available.
+We don't customize any source codes(Zabbix and JobScheduler).
 
 HyClops JobMonitoring provides following features:
 
 * Automatically register Zabbix items for job monitoring.
 * Monitor the job elapse and analyze the job elapse transition.
 * Collaborate job error/delay information to Zabbix, and you can do the action based on Zabbix.
-* Automatically change the Zabbix trigger threashold settings adapt to the job execution.
+* Automatically change the Zabbix trigger threshold during job execution.
 
 # Release Notes {#releases}
 
-* 2014/12/xx ver.0.1.0
+* 2014/12/10 ver.0.1.0
   * Initial release
  
 # Architecture {#architecture}
@@ -54,12 +58,12 @@ JobMonitoring registers automatically following Zabbix information.
 If the job error occurred, JobMonitoring hooks mail send by JobScheduler and collaborates error flag to Zabbix.
 From this, you can use Zabbix trigger and actions.
 
-## Automatically change the Zabbix trigger threashold
+## Automatically change the Zabbix trigger threshold
 
 ![architecture]({{ site.production_url }}/assets/images/error_collaboration_detail.png)
 
 JobMonitoring provides changing the trigger job template.
-If you use this template, you can change the trigger threashold only executing the specified job.
+If you use this template, you can change the trigger threshold only executing the specified job.
 The sample job template configures the job chain that the main job always execute if before process is failed.
 
 # Install {#install}
@@ -161,15 +165,15 @@ Setting the Zabbix trigger to above item, you can monitoring job error/delay sta
 
 ![latest_data]({{ site.production_url }}/assets/images/zabbix_latest_data.png)
 
-## Automatically change the Zabbix trigger threashold
+## Automatically change the Zabbix trigger threshold
 
 After installing HyClops JobMonitoring, you will find the job chain named HyClops_JM_Trigger_Switch_Template in JobScheduler's hyclops_jm directory.
-This job chain is change the trigger threashold template.
+This job chain is change the trigger threshold template.
 
 ![template_jobchain]({{ site.production_url }}/assets/images/jobscheduler_template_jobchain.png)
 
 We will assume the following scenario.
-In general case monitoring memory usage threashold on serverA is 20MB, but when running jobA memory usage threashold change 50MB.
+In general case monitoring memory usage threshold on serverA is 20MB, but when running jobA memory usage threshold change 50MB.
 
 ![architecture]({{ site.production_url }}/assets/images/sample_jobchain.png)
 
@@ -202,7 +206,7 @@ Configure the Zabbix host named in target_zabbix_host.xml.
 &lt;/params>
 </pre>
 
-### Configure the before and after trigger threashold
+### Configure the before and after trigger threshold
 
 Configure the parameter in HyClops_JM_Trigger_switch.job.xml
 
@@ -216,9 +220,9 @@ Configure the parameter in HyClops_JM_Trigger_switch.job.xml
 &lt;/params>
 </pre>
 
-In these configuration, you can use the automatically change the Zabbix trigger threashold.
-Before run jobA the trigger change job run and change the memory threashold 20MB to 50MB.
-After run jobA the trigger return job run and change the memory threashold 20MB.
+In these configuration, the Zabbix trigger threshold will be changed automatically.
+The changing trigger job is executed to change the memory threshold 20MB to 50MB before JobA is started.
+The recovery trigger job is executed to change the memory threshold 50MB to 20MB after JobA was executed.
 
 # Contact {#contact}
 
