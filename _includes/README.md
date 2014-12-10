@@ -215,8 +215,8 @@ Configure the parameter in HyClops_JM_Trigger_switch.job.xml
   &lt;include live_file="target_zabbix_host.xml" node=""/>
   &lt;!-- Specify the target of change trigger name. you select the trigger name from Zabbix Web UI. -->
   &lt;param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/>
-  &lt;!-- Specify the enable of changed trigger conditional expression. -->
-  &lt;param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}<50M"/>
+  &lt;!-- Specify the enable of changed trigger conditional expression. *sign of inequality should be url encoded. -->
+  &lt;param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/>
 &lt;/params>
 </pre>
 

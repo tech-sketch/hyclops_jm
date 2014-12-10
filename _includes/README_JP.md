@@ -210,8 +210,8 @@ HyClops_JM_Trigger_switch.job.xmlのパラメータを設定して下さい
   &lt;include live_file="target_zabbix_host.xml" node=""/>
   &lt;!-- 変更対象となるトリガー名を指定。トリガー名はZabbix Web UIから確認可能な名前を指定。 -->
   &lt;param name="trigger_name" value="Lack of available memory on server {HOST.NAME}"/>
-  &lt;!-- 変更後に有効となるトリガー条件式を指定。 -->
-  &lt;param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}<50M"/>
+  &lt;!-- 変更後に有効となるトリガー条件式を指定。※不等号はURLエンコードが必要 -->
+  &lt;param name="trigger_cond" value="{localhost:vm.memory.size[available].last(0)}&lt;50M"/>
 &lt;/params>
 </pre>
 
