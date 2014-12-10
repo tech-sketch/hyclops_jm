@@ -1,6 +1,7 @@
 # HyClops JobMonitoring
 
-HyClops JobMonitoring is the tool for system operators that is collaborating monitoring tool “Zabbix” and job management tool “JobScheduler”.
+HyClops JobMonitoring is the tool for system operators that is collaborating “Zabbix”(monitoring tool) and “JobScheduler”(job management tool).
+This tool integrates monitoring of JobScheduler's job information on Zabbix. 
 
 You can see the details of HyClops JobMonitoring on [tech-sketch.github.io/hyclops_jm](http://tech-sketch.github.io/hyclops_jm/)
 
