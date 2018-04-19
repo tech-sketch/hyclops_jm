@@ -9,5 +9,5 @@ You can see the details of HyClops JobMonitoring on [tech-sketch.github.io/hyclo
 
 # License
 
-Copyright 2014 TIS Inc. HyClops for Zabbix Team (hyclops@ml.tis.co.jp)
+Copyright 2014 TIS Inc. HyClops for Zabbix Team
 Licensed under the Apache License, Version 2.0. The Apache v2 full text is published at [this link](http://www.apache.org/licenses/LICENSE-2.0).
