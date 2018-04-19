@@ -217,16 +217,6 @@ HyClops_JM_Trigger_switch.job.xmlのパラメータを設定して下さい
 
 これらの設定によって、jobAが稼働する前処理でトリガーしきい値の変更ジョブが稼働し、jobAが稼働し終わった後でトリガーを元に戻す後処理が稼働します。
 
-# 問い合わせ先 {#contact}
-
-フィードバックや不明点等以下までお問い合わせ下さい。
-
-[TIS株式会社](http://www.tis.co.jp)  
-コーポレート本部　戦略技術センター  
-HyClops JobMonitoring 担当宛  
-<hyclops@ml.tis.co.jp>
-
-
 # ライセンス {#license}
 
 HyClops JobMonitoringはApache License, Version 2.0のもとにリリースされています。  

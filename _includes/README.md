@@ -224,17 +224,6 @@ In these configuration, the Zabbix trigger threshold will be changed automatical
 The changing trigger job is executed to change the memory threshold 20MB to 50MB before JobA is started.
 The recovery trigger job is executed to change the memory threshold 50MB to 20MB after JobA was executed.
 
-# Contact {#contact}
-
-Please send feedback to us.
-
-[TIS Inc.](http://www.tis.co.jp)  
-Strategic Technology Center
-
-HyClops JobMonitoring Team  
-<hyclops@ml.tis.co.jp>
-
-
 # License {#license}
 
 HyClops JobMonitoring is released under the Apache License, Version 2.0.
